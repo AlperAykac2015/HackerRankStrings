@@ -1,0 +1,13 @@
+-------------------------------------------------------------------------------
+Test set: com.hackerrank.strings.CharacterFrequencyTest$EfficientApproach
+-------------------------------------------------------------------------------
+Tests run: 6, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.011 s <<< FAILURE! -- in com.hackerrank.strings.CharacterFrequencyTest$EfficientApproach
+com.hackerrank.strings.CharacterFrequencyTest$EfficientApproach.shouldHandleSpaces -- Time elapsed: 0.003 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "java.lang.Integer.intValue()" because the return value of "java.util.Map.get(Object)" is null
+	at com.hackerrank.strings.CharacterFrequency.countCharactersEfficiently(CharacterFrequency.java:47)
+	at com.hackerrank.strings.CharacterFrequencyTest$EfficientApproach.shouldHandleSpaces(CharacterFrequencyTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+
