@@ -1,16 +1,24 @@
 package com.aykacltd.stream;
 
-import com.aykacltd.stream.Address.AddressType;
+import com.aykacltd.stream.Person.Gender;
 import com.aykacltd.stream.Profession.EmploymentStatus;
 import com.aykacltd.stream.Skill.ProficiencyLevel;
-import com.aykacltd.stream.Person.Gender;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.DoubleSummaryStatistics;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * <h1>Java Stream API — Comprehensive Exercise Suite</h1>
@@ -49,7 +57,9 @@ import java.util.stream.*;
  */
 public class StreamExercises {
 
-    /** Shared dataset used by every exercise. */
+    /**
+     * Shared dataset used by every exercise.
+     */
     private static final List<Person> PEOPLE = SampleData.getPeople();
 
     public static void main(String[] args) {
@@ -160,11 +170,11 @@ public class StreamExercises {
      */
     static void filterByAge() {
         List<Person> olderThan30 = PEOPLE.stream()
-                .filter(p -> p.getAge() > 30)
-                .toList();
+            .filter(p -> p.getAge() > 30)
+            .toList();
 
         printExercise("1.1 People older than 30",
-                olderThan30.stream().map(Person::getFullName).toList());
+            olderThan30.stream().map(Person::getFullName).toList());
     }
 
     /**
@@ -176,8 +186,8 @@ public class StreamExercises {
      */
     static void mapToFullNames() {
         List<String> names = PEOPLE.stream()
-                .map(Person::getFullName)
-                .toList();
+            .map(Person::getFullName)
+            .toList();
 
         printExercise("1.2 All full names", names);
     }
@@ -191,10 +201,10 @@ public class StreamExercises {
      */
     static void filterAndMapChained() {
         List<String> fullTimeEmails = PEOPLE.stream()
-                .filter(p -> p.getProfession() != null
-                        && p.getProfession().status() == EmploymentStatus.FULL_TIME)
-                .map(Person::getEmail)
-                .toList();
+            .filter(p -> p.getProfession() != null
+                && p.getProfession().status() == EmploymentStatus.FULL_TIME)
+            .map(Person::getEmail)
+            .toList();
 
         printExercise("1.3 Emails of full-time employees", fullTimeEmails);
     }
@@ -207,11 +217,11 @@ public class StreamExercises {
      */
     static void distinctCities() {
         List<String> cities = PEOPLE.stream()
-                .map(Person::getHomeCity)
-                .filter(c -> !"Unknown".equals(c))
-                .distinct()
-                .sorted()
-                .toList();
+            .map(Person::getHomeCity)
+            .filter(c -> !"Unknown".equals(c))
+            .distinct()
+            .sorted()
+            .toList();
 
         printExercise("1.4 Distinct home cities (sorted)", cities);
     }
@@ -225,12 +235,12 @@ public class StreamExercises {
      */
     static void findFirstHighEarner() {
         Optional<Person> highEarner = PEOPLE.stream()
-                .filter(p -> p.getProfession() != null
-                        && p.getProfession().salary() > 100_000)
-                .findFirst();
+            .filter(p -> p.getProfession() != null
+                && p.getProfession().salary() > 100_000)
+            .findFirst();
 
         printExercise("1.5 First person earning > £100k",
-                highEarner.map(Person::getFullName).orElse("Nobody found"));
+            highEarner.map(Person::getFullName).orElse("Nobody found"));
     }
 
     /**
@@ -241,15 +251,15 @@ public class StreamExercises {
      */
     static void anyMatchAllMatchNoneMatch() {
         boolean anyExpert = PEOPLE.stream()
-                .flatMap(p -> p.getSkills().stream())
-                .anyMatch(s -> s.level() == ProficiencyLevel.EXPERT);
+            .flatMap(p -> p.getSkills().stream())
+            .anyMatch(s -> s.level() == ProficiencyLevel.EXPERT);
 
         boolean allEmployed = PEOPLE.stream()
-                .allMatch(p -> p.getProfession() != null
-                        && p.getProfession().status() != EmploymentStatus.UNEMPLOYED);
+            .allMatch(p -> p.getProfession() != null
+                && p.getProfession().status() != EmploymentStatus.UNEMPLOYED);
 
         boolean noneUnder18 = PEOPLE.stream()
-                .noneMatch(p -> p.getAge() < 18);
+            .noneMatch(p -> p.getAge() < 18);
 
         printExercise("1.6 anyMatch(EXPERT skill)", anyExpert);
         printExercise("    allMatch(employed)", allEmployed);
@@ -269,12 +279,12 @@ public class StreamExercises {
      */
     static void sortBySalaryDescending() {
         List<String> sorted = PEOPLE.stream()
-                .filter(p -> p.getProfession() != null)
-                .sorted(Comparator.comparingDouble(
-                        (Person p) -> p.getProfession().salary()).reversed())
-                .map(p -> "%s — £%,.0f".formatted(
-                        p.getFullName(), p.getProfession().salary()))
-                .toList();
+            .filter(p -> p.getProfession() != null)
+            .sorted(Comparator.comparingDouble(
+                (Person p) -> p.getProfession().salary()).reversed())
+            .map(p -> "%s — £%,.0f".formatted(
+                p.getFullName(), p.getProfession().salary()))
+            .toList();
 
         printExercise("2.1 Sorted by salary (desc)", sorted);
     }
@@ -288,20 +298,20 @@ public class StreamExercises {
      */
     static void sortByMultipleFields() {
         Comparator<Person> byCompanyThenSalary = Comparator
-                .comparing((Person p) -> p.getProfession().company())
-                .thenComparing(
-                        (Person p) -> p.getProfession().salary(),
-                        Comparator.reverseOrder());
+            .comparing((Person p) -> p.getProfession().company())
+            .thenComparing(
+                (Person p) -> p.getProfession().salary(),
+                Comparator.reverseOrder());
 
         List<String> sorted = PEOPLE.stream()
-                .filter(p -> p.getProfession() != null
-                        && p.getProfession().status() != EmploymentStatus.UNEMPLOYED)
-                .sorted(byCompanyThenSalary)
-                .map(p -> "[%s] %s — £%,.0f".formatted(
-                        p.getProfession().company(),
-                        p.getFullName(),
-                        p.getProfession().salary()))
-                .toList();
+            .filter(p -> p.getProfession() != null
+                && p.getProfession().status() != EmploymentStatus.UNEMPLOYED)
+            .sorted(byCompanyThenSalary)
+            .map(p -> "[%s] %s — £%,.0f".formatted(
+                p.getProfession().company(),
+                p.getFullName(),
+                p.getProfession().salary()))
+            .toList();
 
         printExercise("2.2 Sorted by company, then salary desc", sorted);
     }
@@ -316,13 +326,13 @@ public class StreamExercises {
      */
     static void topNBySalary(int n) {
         List<String> topN = PEOPLE.stream()
-                .filter(p -> p.getProfession() != null)
-                .sorted(Comparator.comparingDouble(
-                        (Person p) -> p.getProfession().salary()).reversed())
-                .limit(n)
-                .map(p -> "%s — £%,.0f".formatted(
-                        p.getFullName(), p.getProfession().salary()))
-                .toList();
+            .filter(p -> p.getProfession() != null)
+            .sorted(Comparator.comparingDouble(
+                (Person p) -> p.getProfession().salary()).reversed())
+            .limit(n)
+            .map(p -> "%s — £%,.0f".formatted(
+                p.getFullName(), p.getProfession().salary()))
+            .toList();
 
         printExercise("2.3 Top %d earners".formatted(n), topN);
     }
@@ -342,12 +352,12 @@ public class StreamExercises {
      */
     static void totalSalaryReduce() {
         double totalSalary = PEOPLE.stream()
-                .filter(p -> p.getProfession() != null)
-                .reduce(
-                        0.0,                                     // identity
-                        (sum, p) -> sum + p.getProfession().salary(), // accumulator
-                        Double::sum                              // combiner
-                );
+            .filter(p -> p.getProfession() != null)
+            .reduce(
+                0.0,                                     // identity
+                (sum, p) -> sum + p.getProfession().salary(), // accumulator
+                Double::sum                              // combiner
+            );
 
         printExercise("3.1 Total salary (reduce)", "£%,.2f".formatted(totalSalary));
     }
@@ -360,13 +370,13 @@ public class StreamExercises {
      */
     static void averageSalaryWithCollector() {
         double avgSalary = PEOPLE.stream()
-                .filter(p -> p.getProfession() != null
-                        && p.getProfession().salary() > 0)
-                .collect(Collectors.averagingDouble(
-                        p -> p.getProfession().salary()));
+            .filter(p -> p.getProfession() != null
+                && p.getProfession().salary() > 0)
+            .collect(Collectors.averagingDouble(
+                p -> p.getProfession().salary()));
 
         printExercise("3.2 Average salary (Collectors.averagingDouble)",
-                "£%,.2f".formatted(avgSalary));
+            "£%,.2f".formatted(avgSalary));
     }
 
     /**
@@ -378,16 +388,16 @@ public class StreamExercises {
      */
     static void summarizingSalaryStatistics() {
         DoubleSummaryStatistics stats = PEOPLE.stream()
-                .filter(p -> p.getProfession() != null
-                        && p.getProfession().salary() > 0)
-                .collect(Collectors.summarizingDouble(
-                        p -> p.getProfession().salary()));
+            .filter(p -> p.getProfession() != null
+                && p.getProfession().salary() > 0)
+            .collect(Collectors.summarizingDouble(
+                p -> p.getProfession().salary()));
 
         printExercise("3.3 Salary statistics",
-                "count=%d, min=£%,.0f, max=£%,.0f, avg=£%,.0f, sum=£%,.0f"
-                        .formatted(stats.getCount(), stats.getMin(),
-                                stats.getMax(), stats.getAverage(),
-                                stats.getSum()));
+            "count=%d, min=£%,.0f, max=£%,.0f, avg=£%,.0f, sum=£%,.0f"
+                .formatted(stats.getCount(), stats.getMin(),
+                    stats.getMax(), stats.getAverage(),
+                    stats.getSum()));
     }
 
     /**
@@ -399,14 +409,14 @@ public class StreamExercises {
      */
     static void highestPaidPerson() {
         Optional<Person> highest = PEOPLE.stream()
-                .filter(p -> p.getProfession() != null)
-                .collect(Collectors.maxBy(
-                        Comparator.comparingDouble(
-                                p -> p.getProfession().salary())));
+            .filter(p -> p.getProfession() != null)
+            .collect(Collectors.maxBy(
+                Comparator.comparingDouble(
+                    p -> p.getProfession().salary())));
 
         printExercise("3.4 Highest paid person",
-                highest.map(p -> "%s — £%,.0f".formatted(
-                        p.getFullName(), p.getProfession().salary())).orElse("N/A"));
+            highest.map(p -> "%s — £%,.0f".formatted(
+                p.getFullName(), p.getProfession().salary())).orElse("N/A"));
     }
 
     /**
@@ -418,8 +428,8 @@ public class StreamExercises {
      */
     static void concatenateNamesWithJoining() {
         String joined = PEOPLE.stream()
-                .map(Person::getFullName)
-                .collect(Collectors.joining(", ", "[", "]"));
+            .map(Person::getFullName)
+            .collect(Collectors.joining(", ", "[", "]"));
 
         printExercise("3.5 All names joined", joined);
     }
@@ -438,11 +448,11 @@ public class StreamExercises {
      */
     static void allUniqueSkillNames() {
         List<String> uniqueSkills = PEOPLE.stream()
-                .flatMap(p -> p.getSkills().stream())
-                .map(Skill::name)
-                .distinct()
-                .sorted()
-                .toList();
+            .flatMap(p -> p.getSkills().stream())
+            .map(Skill::name)
+            .distinct()
+            .sorted()
+            .toList();
 
         printExercise("4.1 All unique skills", uniqueSkills);
     }
@@ -459,15 +469,15 @@ public class StreamExercises {
      */
     static void peopleBySkillName(String skillName) {
         List<String> holders = PEOPLE.stream()
-                .filter(p -> p.getSkills().stream()
-                        .anyMatch(s -> s.name().equalsIgnoreCase(skillName)))
-                .map(p -> "%s (%s)".formatted(
-                        p.getFullName(),
-                        p.getSkills().stream()
-                                .filter(s -> s.name().equalsIgnoreCase(skillName))
-                                .map(s -> s.level().name())
-                                .findFirst().orElse("?")))
-                .toList();
+            .filter(p -> p.getSkills().stream()
+                .anyMatch(s -> s.name().equalsIgnoreCase(skillName)))
+            .map(p -> "%s (%s)".formatted(
+                p.getFullName(),
+                p.getSkills().stream()
+                    .filter(s -> s.name().equalsIgnoreCase(skillName))
+                    .map(s -> s.level().name())
+                    .findFirst().orElse("?")))
+            .toList();
 
         printExercise("4.2 People with '%s' skill".formatted(skillName), holders);
     }
@@ -481,10 +491,10 @@ public class StreamExercises {
      */
     static void flatMapAddressesToCities() {
         Map<String, Long> cityCounts = PEOPLE.stream()
-                .flatMap(p -> p.getAddresses().stream())
-                .collect(Collectors.groupingBy(
-                        Address::city,
-                        Collectors.counting()));
+            .flatMap(p -> p.getAddresses().stream())
+            .collect(Collectors.groupingBy(
+                Address::city,
+                Collectors.counting()));
 
         printExercise("4.3 Address city frequency", cityCounts);
     }
@@ -502,10 +512,10 @@ public class StreamExercises {
      */
     static void groupByGender() {
         Map<Gender, List<Person>> byGender = PEOPLE.stream()
-                .collect(Collectors.groupingBy(Person::getGender));
+            .collect(Collectors.groupingBy(Person::getGender));
 
         printExercise("5.1 Group by gender",
-                formatGroupMap(byGender, Person::getFullName));
+            formatGroupMap(byGender, Person::getFullName));
     }
 
     /**
@@ -516,12 +526,12 @@ public class StreamExercises {
      */
     static void groupByCompany() {
         Map<String, List<Person>> byCompany = PEOPLE.stream()
-                .filter(p -> p.getProfession() != null)
-                .collect(Collectors.groupingBy(
-                        p -> p.getProfession().company()));
+            .filter(p -> p.getProfession() != null)
+            .collect(Collectors.groupingBy(
+                p -> p.getProfession().company()));
 
         printExercise("5.2 Group by company",
-                formatGroupMap(byCompany, Person::getFullName));
+            formatGroupMap(byCompany, Person::getFullName));
     }
 
     /**
@@ -534,10 +544,10 @@ public class StreamExercises {
      */
     static void groupByDepartmentCounting() {
         Map<String, Long> deptCounts = PEOPLE.stream()
-                .filter(p -> p.getProfession() != null)
-                .collect(Collectors.groupingBy(
-                        p -> p.getProfession().department(),
-                        Collectors.counting()));
+            .filter(p -> p.getProfession() != null)
+            .collect(Collectors.groupingBy(
+                p -> p.getProfession().department(),
+                Collectors.counting()));
 
         printExercise("5.3 Count by department", deptCounts);
     }
@@ -552,19 +562,19 @@ public class StreamExercises {
      */
     static void groupByCountryAverageSalary() {
         Map<String, Double> avgByCountry = PEOPLE.stream()
-                .filter(p -> p.getProfession() != null
-                        && p.getProfession().salary() > 0)
-                .collect(Collectors.groupingBy(
-                        Person::getHomeCountry,
-                        Collectors.averagingDouble(
-                                p -> p.getProfession().salary())));
+            .filter(p -> p.getProfession() != null
+                && p.getProfession().salary() > 0)
+            .collect(Collectors.groupingBy(
+                Person::getHomeCountry,
+                Collectors.averagingDouble(
+                    p -> p.getProfession().salary())));
 
         // Format nicely
         Map<String, String> formatted = new LinkedHashMap<>();
         avgByCountry.entrySet().stream()
-                .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
-                .forEach(e -> formatted.put(e.getKey(),
-                        "£%,.0f".formatted(e.getValue())));
+            .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
+            .forEach(e -> formatted.put(e.getKey(),
+                "£%,.0f".formatted(e.getValue())));
 
         printExercise("5.4 Average salary by country", formatted);
     }
@@ -579,11 +589,11 @@ public class StreamExercises {
      */
     static void groupByCityAndCollectNames() {
         Map<String, List<String>> namesByCity = PEOPLE.stream()
-                .collect(Collectors.groupingBy(
-                        Person::getHomeCity,
-                        Collectors.mapping(
-                                Person::getFullName,
-                                Collectors.toList())));
+            .collect(Collectors.groupingBy(
+                Person::getHomeCity,
+                Collectors.mapping(
+                    Person::getFullName,
+                    Collectors.toList())));
 
         printExercise("5.5 Names grouped by city", namesByCity);
     }
@@ -601,14 +611,14 @@ public class StreamExercises {
      */
     static void multiLevelGroupByCountryThenDepartment() {
         Map<String, Map<String, List<String>>> result = PEOPLE.stream()
-                .filter(p -> p.getProfession() != null)
-                .collect(Collectors.groupingBy(
-                        Person::getHomeCountry,                          // level 1
-                        Collectors.groupingBy(                           // level 2
-                                p -> p.getProfession().department(),
-                                Collectors.mapping(
-                                        Person::getFullName,
-                                        Collectors.toList()))));
+            .filter(p -> p.getProfession() != null)
+            .collect(Collectors.groupingBy(
+                Person::getHomeCountry,                          // level 1
+                Collectors.groupingBy(                           // level 2
+                    p -> p.getProfession().department(),
+                    Collectors.mapping(
+                        Person::getFullName,
+                        Collectors.toList()))));
 
         printExercise("5.6 Group by country → department", result);
     }
@@ -623,13 +633,13 @@ public class StreamExercises {
      */
     static void multiLevelGroupByCompanyThenGender() {
         Map<String, Map<Gender, Long>> result = PEOPLE.stream()
-                .filter(p -> p.getProfession() != null
-                        && p.getProfession().status() != EmploymentStatus.UNEMPLOYED)
-                .collect(Collectors.groupingBy(
-                        p -> p.getProfession().company(),
-                        Collectors.groupingBy(
-                                Person::getGender,
-                                Collectors.counting())));
+            .filter(p -> p.getProfession() != null
+                && p.getProfession().status() != EmploymentStatus.UNEMPLOYED)
+            .collect(Collectors.groupingBy(
+                p -> p.getProfession().company(),
+                Collectors.groupingBy(
+                    Person::getGender,
+                    Collectors.counting())));
 
         printExercise("5.7 Group by company → gender (count)", result);
     }
@@ -644,14 +654,14 @@ public class StreamExercises {
      */
     static void groupByAgeRange() {
         Map<String, List<String>> byAgeRange = PEOPLE.stream()
-                .collect(Collectors.groupingBy(
-                        p -> {
-                            int decade = (p.getAge() / 10) * 10;
-                            return "%d–%d".formatted(decade, decade + 9);
-                        },
-                        TreeMap::new,  // sorted map factory
-                        Collectors.mapping(Person::getFullName,
-                                Collectors.toList())));
+            .collect(Collectors.groupingBy(
+                p -> {
+                    int decade = (p.getAge() / 10) * 10;
+                    return "%d–%d".formatted(decade, decade + 9);
+                },
+                TreeMap::new,  // sorted map factory
+                Collectors.mapping(Person::getFullName,
+                    Collectors.toList())));
 
         printExercise("5.8 Group by age range", byAgeRange);
     }
@@ -666,12 +676,12 @@ public class StreamExercises {
      */
     static void groupBySkillCategory() {
         Map<String, Set<String>> skillsByCategory = PEOPLE.stream()
-                .flatMap(p -> p.getSkills().stream())
-                .collect(Collectors.groupingBy(
-                        Skill::category,
-                        Collectors.mapping(
-                                Skill::name,
-                                Collectors.toSet())));
+            .flatMap(p -> p.getSkills().stream())
+            .collect(Collectors.groupingBy(
+                Skill::category,
+                Collectors.mapping(
+                    Skill::name,
+                    Collectors.toSet())));
 
         printExercise("5.9 Unique skills by category", skillsByCategory);
     }
@@ -692,20 +702,20 @@ public class StreamExercises {
      */
     static void partitionBySalaryThreshold(double threshold) {
         Map<Boolean, List<String>> partitioned = PEOPLE.stream()
-                .filter(p -> p.getProfession() != null
-                        && p.getProfession().salary() > 0)
-                .collect(Collectors.partitioningBy(
-                        p -> p.getProfession().salary() >= threshold,
-                        Collectors.mapping(
-                                p -> "%s (£%,.0f)".formatted(
-                                        p.getFullName(),
-                                        p.getProfession().salary()),
-                                Collectors.toList())));
+            .filter(p -> p.getProfession() != null
+                && p.getProfession().salary() > 0)
+            .collect(Collectors.partitioningBy(
+                p -> p.getProfession().salary() >= threshold,
+                Collectors.mapping(
+                    p -> "%s (£%,.0f)".formatted(
+                        p.getFullName(),
+                        p.getProfession().salary()),
+                    Collectors.toList())));
 
         printExercise("6.1 Partition by salary ≥ £%,.0f".formatted(threshold),
-                "Above: " + partitioned.get(true));
+            "Above: " + partitioned.get(true));
         printExercise("    ",
-                "Below: " + partitioned.get(false));
+            "Below: " + partitioned.get(false));
     }
 
     /**
@@ -717,14 +727,14 @@ public class StreamExercises {
      */
     static void partitionByEmploymentStatusWithCount() {
         Map<Boolean, Long> partition = PEOPLE.stream()
-                .collect(Collectors.partitioningBy(
-                        p -> p.getProfession() != null
-                                && p.getProfession().status() != EmploymentStatus.UNEMPLOYED,
-                        Collectors.counting()));
+            .collect(Collectors.partitioningBy(
+                p -> p.getProfession() != null
+                    && p.getProfession().status() != EmploymentStatus.UNEMPLOYED,
+                Collectors.counting()));
 
         printExercise("6.2 Employed vs unemployed count",
-                "Employed: %d, Unemployed: %d"
-                        .formatted(partition.get(true), partition.get(false)));
+            "Employed: %d, Unemployed: %d"
+                .formatted(partition.get(true), partition.get(false)));
     }
 
     // ═══════════════════════════════════════════════════════════════════
@@ -741,13 +751,13 @@ public class StreamExercises {
      */
     static void emailToPersonMap() {
         Map<String, String> emailMap = PEOPLE.stream()
-                .filter(p -> p.getEmail() != null)
-                .collect(Collectors.toMap(
-                        Person::getEmail,
-                        Person::getFullName));
+            .filter(p -> p.getEmail() != null)
+            .collect(Collectors.toMap(
+                Person::getEmail,
+                Person::getFullName));
 
         printExercise("7.1 Email → Name lookup (first 5)",
-                emailMap.entrySet().stream().limit(5).toList());
+            emailMap.entrySet().stream().limit(5).toList());
     }
 
     /**
@@ -760,19 +770,19 @@ public class StreamExercises {
      */
     static void companyToHighestSalaryMap() {
         Map<String, Double> companyMaxSalary = PEOPLE.stream()
-                .filter(p -> p.getProfession() != null
-                        && p.getProfession().status() != EmploymentStatus.UNEMPLOYED)
-                .collect(Collectors.toMap(
-                        p -> p.getProfession().company(),
-                        p -> p.getProfession().salary(),
-                        BinaryOperator.maxBy(Double::compareTo)));
+            .filter(p -> p.getProfession() != null
+                && p.getProfession().status() != EmploymentStatus.UNEMPLOYED)
+            .collect(Collectors.toMap(
+                p -> p.getProfession().company(),
+                p -> p.getProfession().salary(),
+                BinaryOperator.maxBy(Double::compareTo)));
 
         // Format for display
         Map<String, String> formatted = new LinkedHashMap<>();
         companyMaxSalary.entrySet().stream()
-                .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
-                .forEach(e -> formatted.put(e.getKey(),
-                        "£%,.0f".formatted(e.getValue())));
+            .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
+            .forEach(e -> formatted.put(e.getKey(),
+                "£%,.0f".formatted(e.getValue())));
 
         printExercise("7.2 Company → highest salary", formatted);
     }
@@ -786,12 +796,12 @@ public class StreamExercises {
      */
     static void skillNameToPersonCountMap() {
         Map<String, Long> skillCounts = PEOPLE.stream()
-                .flatMap(p -> p.getSkills().stream())
-                .collect(Collectors.toMap(
-                        Skill::name,
-                        s -> 1L,
-                        Long::sum,
-                        TreeMap::new));  // sorted by skill name
+            .flatMap(p -> p.getSkills().stream())
+            .collect(Collectors.toMap(
+                Skill::name,
+                s -> 1L,
+                Long::sum,
+                TreeMap::new));  // sorted by skill name
 
         printExercise("7.3 Skill → number of people", skillCounts);
     }
@@ -815,32 +825,37 @@ public class StreamExercises {
      */
     static void customMedianSalaryCollector() {
         Collector<Double, ?, OptionalDouble> medianCollector = Collector.of(
-                // supplier: mutable list to accumulate all salaries
-                ArrayList<Double>::new,
-                // accumulator: add each salary
-                ArrayList::add,
-                // combiner: merge two lists (parallel support)
-                (left, right) -> { left.addAll(right); return left; },
-                // finisher: sort, then pick the middle element
-                list -> {
-                    if (list.isEmpty()) return OptionalDouble.empty();
-                    Collections.sort(list);
-                    int mid = list.size() / 2;
-                    double median = list.size() % 2 == 0
-                            ? (list.get(mid - 1) + list.get(mid)) / 2.0
-                            : list.get(mid);
-                    return OptionalDouble.of(median);
+            // supplier: mutable list to accumulate all salaries
+            ArrayList<Double>::new,
+            // accumulator: add each salary
+            ArrayList::add,
+            // combiner: merge two lists (parallel support)
+            (left, right) -> {
+                left.addAll(right);
+                return left;
+            },
+            // finisher: sort, then pick the middle element
+            list -> {
+                if (list.isEmpty()) {
+                    return OptionalDouble.empty();
                 }
+                Collections.sort(list);
+                int mid = list.size() / 2;
+                double median = list.size() % 2 == 0
+                    ? (list.get(mid - 1) + list.get(mid)) / 2.0
+                    : list.get(mid);
+                return OptionalDouble.of(median);
+            }
         );
 
         OptionalDouble median = PEOPLE.stream()
-                .filter(p -> p.getProfession() != null
-                        && p.getProfession().salary() > 0)
-                .map(p -> p.getProfession().salary())
-                .collect(medianCollector);
+            .filter(p -> p.getProfession() != null
+                && p.getProfession().salary() > 0)
+            .map(p -> p.getProfession().salary())
+            .collect(medianCollector);
 
         printExercise("8.1 Median salary (custom collector)",
-                median.isPresent() ? "£%,.0f".formatted(median.getAsDouble()) : "N/A");
+            median.isPresent() ? "£%,.0f".formatted(median.getAsDouble()) : "N/A");
     }
 
     /**
@@ -852,26 +867,26 @@ public class StreamExercises {
      */
     static void customSalaryRangeCollector() {
         Collector<Double, double[], Double> rangeCollector = Collector.of(
-                () -> new double[]{Double.MAX_VALUE, Double.MIN_VALUE}, // [min, max]
-                (acc, val) -> {
-                    acc[0] = Math.min(acc[0], val);
-                    acc[1] = Math.max(acc[1], val);
-                },
-                (left, right) -> new double[]{
-                        Math.min(left[0], right[0]),
-                        Math.max(left[1], right[1])
-                },
-                acc -> acc[1] - acc[0]
+            () -> new double[] {Double.MAX_VALUE, Double.MIN_VALUE}, // [min, max]
+            (acc, val) -> {
+                acc[0] = Math.min(acc[0], val);
+                acc[1] = Math.max(acc[1], val);
+            },
+            (left, right) -> new double[] {
+                Math.min(left[0], right[0]),
+                Math.max(left[1], right[1])
+            },
+            acc -> acc[1] - acc[0]
         );
 
         double range = PEOPLE.stream()
-                .filter(p -> p.getProfession() != null
-                        && p.getProfession().salary() > 0)
-                .map(p -> p.getProfession().salary())
-                .collect(rangeCollector);
+            .filter(p -> p.getProfession() != null
+                && p.getProfession().salary() > 0)
+            .map(p -> p.getProfession().salary())
+            .collect(rangeCollector);
 
         printExercise("8.2 Salary range (custom collector)",
-                "£%,.0f".formatted(range));
+            "£%,.0f".formatted(range));
     }
 
     // ═══════════════════════════════════════════════════════════════════
@@ -888,19 +903,19 @@ public class StreamExercises {
      */
     static void groupByCompanyWithSalarySummary() {
         Map<String, DoubleSummaryStatistics> summary = PEOPLE.stream()
-                .filter(p -> p.getProfession() != null
-                        && p.getProfession().status() != EmploymentStatus.UNEMPLOYED)
-                .collect(Collectors.groupingBy(
-                        p -> p.getProfession().company(),
-                        Collectors.summarizingDouble(
-                                p -> p.getProfession().salary())));
+            .filter(p -> p.getProfession() != null
+                && p.getProfession().status() != EmploymentStatus.UNEMPLOYED)
+            .collect(Collectors.groupingBy(
+                p -> p.getProfession().company(),
+                Collectors.summarizingDouble(
+                    p -> p.getProfession().salary())));
 
         Map<String, String> formatted = new LinkedHashMap<>();
         summary.forEach((company, stats) ->
-                formatted.put(company,
-                        "count=%d, avg=£%,.0f, min=£%,.0f, max=£%,.0f"
-                                .formatted(stats.getCount(), stats.getAverage(),
-                                        stats.getMin(), stats.getMax())));
+            formatted.put(company,
+                "count=%d, avg=£%,.0f, min=£%,.0f, max=£%,.0f"
+                    .formatted(stats.getCount(), stats.getAverage(),
+                        stats.getMin(), stats.getMax())));
 
         printExercise("9.1 Company salary summary", formatted);
     }
@@ -917,15 +932,15 @@ public class StreamExercises {
     static void collectingAndThenExample() {
         // Collect names, then make the list unmodifiable and uppercase
         List<String> unmodifiableNames = PEOPLE.stream()
-                .map(Person::getFullName)
-                .collect(Collectors.collectingAndThen(
-                        Collectors.toList(),
-                        list -> list.stream()
-                                .map(String::toUpperCase)
-                                .collect(Collectors.toUnmodifiableList())));
+            .map(Person::getFullName)
+            .collect(Collectors.collectingAndThen(
+                Collectors.toList(),
+                list -> list.stream()
+                    .map(String::toUpperCase)
+                    .collect(Collectors.toUnmodifiableList())));
 
         printExercise("9.2 collectingAndThen (uppercase, unmodifiable)",
-                unmodifiableNames.stream().limit(5).toList());
+            unmodifiableNames.stream().limit(5).toList());
 
         // Prove it's unmodifiable
         try {
@@ -947,18 +962,18 @@ public class StreamExercises {
     static void filteringCollectorExample() {
         // Group by company, but only keep people with salary > 80k
         Map<String, List<String>> highEarnersByCompany = PEOPLE.stream()
-                .filter(p -> p.getProfession() != null
-                        && p.getProfession().status() != EmploymentStatus.UNEMPLOYED)
-                .collect(Collectors.groupingBy(
-                        p -> p.getProfession().company(),
-                        Collectors.filtering(
-                                p -> p.getProfession().salary() > 80_000,
-                                Collectors.mapping(
-                                        Person::getFullName,
-                                        Collectors.toList()))));
+            .filter(p -> p.getProfession() != null
+                && p.getProfession().status() != EmploymentStatus.UNEMPLOYED)
+            .collect(Collectors.groupingBy(
+                p -> p.getProfession().company(),
+                Collectors.filtering(
+                    p -> p.getProfession().salary() > 80_000,
+                    Collectors.mapping(
+                        Person::getFullName,
+                        Collectors.toList()))));
 
         printExercise("9.3 Collectors.filtering (salary > 80k by company)",
-                highEarnersByCompany);
+            highEarnersByCompany);
     }
 
     /**
@@ -973,16 +988,16 @@ public class StreamExercises {
     static void flatMappingCollectorExample() {
         // Group by company → all skill names (flattened and distinct)
         Map<String, Set<String>> skillsByCompany = PEOPLE.stream()
-                .filter(p -> p.getProfession() != null
-                        && p.getProfession().status() != EmploymentStatus.UNEMPLOYED)
-                .collect(Collectors.groupingBy(
-                        p -> p.getProfession().company(),
-                        Collectors.flatMapping(
-                                p -> p.getSkills().stream().map(Skill::name),
-                                Collectors.toSet())));
+            .filter(p -> p.getProfession() != null
+                && p.getProfession().status() != EmploymentStatus.UNEMPLOYED)
+            .collect(Collectors.groupingBy(
+                p -> p.getProfession().company(),
+                Collectors.flatMapping(
+                    p -> p.getSkills().stream().map(Skill::name),
+                    Collectors.toSet())));
 
         printExercise("9.4 Collectors.flatMapping (all skills by company)",
-                skillsByCompany);
+            skillsByCompany);
     }
 
     /**
@@ -995,14 +1010,14 @@ public class StreamExercises {
      */
     static void groupByDepartmentThenPartitionBySenior() {
         Map<String, Map<Boolean, List<String>>> result = PEOPLE.stream()
-                .filter(p -> p.getProfession() != null)
-                .collect(Collectors.groupingBy(
-                        p -> p.getProfession().department(),
-                        Collectors.partitioningBy(
-                                p -> p.getProfession().yearsExperience() >= 10,
-                                Collectors.mapping(
-                                        Person::getFullName,
-                                        Collectors.toList()))));
+            .filter(p -> p.getProfession() != null)
+            .collect(Collectors.groupingBy(
+                p -> p.getProfession().department(),
+                Collectors.partitioningBy(
+                    p -> p.getProfession().yearsExperience() >= 10,
+                    Collectors.mapping(
+                        Person::getFullName,
+                        Collectors.toList()))));
 
         printExercise("9.5 Dept → Senior (≥10yrs) / Junior partition", result);
     }
@@ -1023,12 +1038,12 @@ public class StreamExercises {
      */
     static void parallelSalarySum() {
         double totalParallel = PEOPLE.parallelStream()
-                .filter(p -> p.getProfession() != null)
-                .mapToDouble(p -> p.getProfession().salary())
-                .sum();
+            .filter(p -> p.getProfession() != null)
+            .mapToDouble(p -> p.getProfession().salary())
+            .sum();
 
         printExercise("10.1 Total salary (parallel stream)",
-                "£%,.2f".formatted(totalParallel));
+            "£%,.2f".formatted(totalParallel));
     }
 
     /**
@@ -1043,13 +1058,13 @@ public class StreamExercises {
      */
     static void parallelGrouping() {
         ConcurrentMap<String, Long> concurrentDeptCounts = PEOPLE.parallelStream()
-                .filter(p -> p.getProfession() != null)
-                .collect(Collectors.groupingByConcurrent(
-                        p -> p.getProfession().department(),
-                        Collectors.counting()));
+            .filter(p -> p.getProfession() != null)
+            .collect(Collectors.groupingByConcurrent(
+                p -> p.getProfession().department(),
+                Collectors.counting()));
 
         printExercise("10.2 Parallel groupingByConcurrent (dept counts)",
-                concurrentDeptCounts);
+            concurrentDeptCounts);
     }
 
     // ═══════════════════════════════════════════════════════════════════
@@ -1066,20 +1081,21 @@ public class StreamExercises {
      * Eliminates the need for two separate stream traversals.</p>
      */
     static void teeingMinMaxSalary() {
-        record MinMax(double min, double max) {}
+        record MinMax(double min, double max) {
+        }
 
         MinMax minMax = PEOPLE.stream()
-                .filter(p -> p.getProfession() != null
-                        && p.getProfession().salary() > 0)
-                .map(p -> p.getProfession().salary())
-                .collect(Collectors.teeing(
-                        Collectors.minBy(Double::compareTo),
-                        Collectors.maxBy(Double::compareTo),
-                        (min, max) -> new MinMax(
-                                min.orElse(0.0), max.orElse(0.0))));
+            .filter(p -> p.getProfession() != null
+                && p.getProfession().salary() > 0)
+            .map(p -> p.getProfession().salary())
+            .collect(Collectors.teeing(
+                Collectors.minBy(Double::compareTo),
+                Collectors.maxBy(Double::compareTo),
+                (min, max) -> new MinMax(
+                    min.orElse(0.0), max.orElse(0.0))));
 
         printExercise("11.1 Teeing: min & max salary",
-                "min=£%,.0f, max=£%,.0f".formatted(minMax.min, minMax.max));
+            "min=£%,.0f, max=£%,.0f".formatted(minMax.min, minMax.max));
     }
 
     /**
@@ -1091,19 +1107,20 @@ public class StreamExercises {
      * the other counts, and the merger combines them.</p>
      */
     static void teeingAverageAndCount() {
-        record AvgAndCount(double average, long count) {}
+        record AvgAndCount(double average, long count) {
+        }
 
         AvgAndCount result = PEOPLE.stream()
-                .filter(p -> p.getProfession() != null
-                        && p.getProfession().salary() > 0)
-                .collect(Collectors.teeing(
-                        Collectors.averagingDouble(
-                                p -> p.getProfession().salary()),
-                        Collectors.counting(),
-                        AvgAndCount::new));
+            .filter(p -> p.getProfession() != null
+                && p.getProfession().salary() > 0)
+            .collect(Collectors.teeing(
+                Collectors.averagingDouble(
+                    p -> p.getProfession().salary()),
+                Collectors.counting(),
+                AvgAndCount::new));
 
         printExercise("11.2 Teeing: avg salary & count",
-                "%d people, avg=£%,.0f".formatted(result.count, result.average));
+            "%d people, avg=£%,.0f".formatted(result.count, result.average));
     }
 
     /**
@@ -1117,22 +1134,23 @@ public class StreamExercises {
      * short-lived intermediate streams.</p>
      */
     static void mapMultiExpandSkills() {
-        record PersonSkill(String personName, String skillName, ProficiencyLevel level) {}
+        record PersonSkill(String personName, String skillName, ProficiencyLevel level) {
+        }
 
         List<String> expanded = PEOPLE.stream()
-                .<PersonSkill>mapMulti((person, consumer) -> {
-                    for (Skill skill : person.getSkills()) {
-                        if (skill.level().getWeight() >= ProficiencyLevel.ADVANCED.getWeight()) {
-                            consumer.accept(new PersonSkill(
-                                    person.getFullName(),
-                                    skill.name(),
-                                    skill.level()));
-                        }
+            .<PersonSkill>mapMulti((person, consumer) -> {
+                for (Skill skill : person.getSkills()) {
+                    if (skill.level().getWeight() >= ProficiencyLevel.ADVANCED.getWeight()) {
+                        consumer.accept(new PersonSkill(
+                            person.getFullName(),
+                            skill.name(),
+                            skill.level()));
                     }
-                })
-                .map(ps -> "%s → %s (%s)".formatted(
-                        ps.personName, ps.skillName, ps.level))
-                .toList();
+                }
+            })
+            .map(ps -> "%s → %s (%s)".formatted(
+                ps.personName, ps.skillName, ps.level))
+            .toList();
 
         printExercise("11.3 mapMulti: ADVANCED+ skills per person", expanded);
     }
@@ -1153,44 +1171,45 @@ public class StreamExercises {
     static void employeeDashboardReport() {
         record CompanyReport(String company, long headcount,
                              double avgSalary, String topEarner,
-                             Set<String> allSkills) {}
+                             Set<String> allSkills) {
+        }
 
         Map<String, List<Person>> byCompany = PEOPLE.stream()
-                .filter(p -> p.getProfession() != null
-                        && p.getProfession().status() != EmploymentStatus.UNEMPLOYED)
-                .collect(Collectors.groupingBy(
-                        p -> p.getProfession().company()));
+            .filter(p -> p.getProfession() != null
+                && p.getProfession().status() != EmploymentStatus.UNEMPLOYED)
+            .collect(Collectors.groupingBy(
+                p -> p.getProfession().company()));
 
         List<CompanyReport> reports = byCompany.entrySet().stream()
-                .map(entry -> {
-                    String company = entry.getKey();
-                    List<Person> employees = entry.getValue();
+            .map(entry -> {
+                String company = entry.getKey();
+                List<Person> employees = entry.getValue();
 
-                    long headcount = employees.size();
+                long headcount = employees.size();
 
-                    double avgSalary = employees.stream()
-                            .mapToDouble(p -> p.getProfession().salary())
-                            .average().orElse(0);
+                double avgSalary = employees.stream()
+                    .mapToDouble(p -> p.getProfession().salary())
+                    .average().orElse(0);
 
-                    String topEarner = employees.stream()
-                            .max(Comparator.comparingDouble(
-                                    p -> p.getProfession().salary()))
-                            .map(p -> "%s (£%,.0f)".formatted(
-                                    p.getFullName(),
-                                    p.getProfession().salary()))
-                            .orElse("N/A");
+                String topEarner = employees.stream()
+                    .max(Comparator.comparingDouble(
+                        p -> p.getProfession().salary()))
+                    .map(p -> "%s (£%,.0f)".formatted(
+                        p.getFullName(),
+                        p.getProfession().salary()))
+                    .orElse("N/A");
 
-                    Set<String> allSkills = employees.stream()
-                            .flatMap(p -> p.getSkills().stream())
-                            .map(Skill::name)
-                            .collect(Collectors.toSet());
+                Set<String> allSkills = employees.stream()
+                    .flatMap(p -> p.getSkills().stream())
+                    .map(Skill::name)
+                    .collect(Collectors.toSet());
 
-                    return new CompanyReport(company, headcount,
-                            avgSalary, topEarner, allSkills);
-                })
-                .sorted(Comparator.comparingLong(
-                        CompanyReport::headcount).reversed())
-                .toList();
+                return new CompanyReport(company, headcount,
+                    avgSalary, topEarner, allSkills);
+            })
+            .sorted(Comparator.comparingLong(
+                CompanyReport::headcount).reversed())
+            .toList();
 
         System.out.println("  ► 12.1 Employee Dashboard Report:");
         reports.forEach(r -> {
@@ -1214,32 +1233,33 @@ public class StreamExercises {
      */
     static void skillGapAnalysis() {
         record SkillStats(String skill, long holders,
-                          double avgProficiency) {}
+                          double avgProficiency) {
+        }
 
         List<SkillStats> stats = PEOPLE.stream()
-                .flatMap(p -> p.getSkills().stream())
-                .collect(Collectors.groupingBy(
-                        Skill::name,
-                        Collectors.teeing(
-                                Collectors.counting(),
-                                Collectors.averagingInt(
-                                        s -> s.level().getWeight()),
-                                (count, avgWeight) -> new SkillStats(
-                                        "", count, avgWeight))))
-                .entrySet().stream()
-                .map(e -> new SkillStats(e.getKey(),
-                        e.getValue().holders(),
-                        e.getValue().avgProficiency()))
-                .sorted(Comparator.comparingLong(
-                        SkillStats::holders).reversed())
-                .toList();
+            .flatMap(p -> p.getSkills().stream())
+            .collect(Collectors.groupingBy(
+                Skill::name,
+                Collectors.teeing(
+                    Collectors.counting(),
+                    Collectors.averagingInt(
+                        s -> s.level().getWeight()),
+                    (count, avgWeight) -> new SkillStats(
+                        "", count, avgWeight))))
+            .entrySet().stream()
+            .map(e -> new SkillStats(e.getKey(),
+                e.getValue().holders(),
+                e.getValue().avgProficiency()))
+            .sorted(Comparator.comparingLong(
+                SkillStats::holders).reversed())
+            .toList();
 
         System.out.println("  ► 12.2 Skill Gap Analysis:");
         System.out.println("    %-22s  Holders  Avg Proficiency".formatted("Skill"));
         System.out.println("    " + "─".repeat(50));
         stats.forEach(s ->
-                System.out.println("    %-22s  %4d     %.1f / 4.0"
-                        .formatted(s.skill, s.holders, s.avgProficiency)));
+            System.out.println("    %-22s  %4d     %.1f / 4.0"
+                .formatted(s.skill, s.holders, s.avgProficiency)));
     }
 
     /**
@@ -1252,25 +1272,33 @@ public class StreamExercises {
      */
     static void salaryBandDistribution() {
         Map<String, Long> bands = PEOPLE.stream()
-                .filter(p -> p.getProfession() != null
-                        && p.getProfession().salary() > 0)
-                .collect(Collectors.groupingBy(
-                        p -> {
-                            double salary = p.getProfession().salary();
-                            if (salary < 40_000) return "  < £40k";
-                            if (salary < 60_000) return " £40k–£60k";
-                            if (salary < 80_000) return " £60k–£80k";
-                            if (salary < 100_000) return " £80k–£100k";
-                            return "£100k+";
-                        },
-                        TreeMap::new,
-                        Collectors.counting()));
+            .filter(p -> p.getProfession() != null
+                && p.getProfession().salary() > 0)
+            .collect(Collectors.groupingBy(
+                p -> {
+                    double salary = p.getProfession().salary();
+                    if (salary < 40_000) {
+                        return "  < £40k";
+                    }
+                    if (salary < 60_000) {
+                        return " £40k–£60k";
+                    }
+                    if (salary < 80_000) {
+                        return " £60k–£80k";
+                    }
+                    if (salary < 100_000) {
+                        return " £80k–£100k";
+                    }
+                    return "£100k+";
+                },
+                TreeMap::new,
+                Collectors.counting()));
 
         System.out.println("  ► 12.3 Salary Band Distribution:");
         bands.forEach((band, count) ->
-                System.out.println("    %-12s │%s %d"
-                        .formatted(band, "█".repeat(count.intValue() * 3),
-                                count)));
+            System.out.println("    %-12s │%s %d"
+                .formatted(band, "█".repeat(count.intValue() * 3),
+                    count)));
     }
 
     // ═══════════════════════════════════════════════════════════════════
@@ -1292,12 +1320,12 @@ public class StreamExercises {
      * by transforming each person in the value list with a mapper.
      */
     private static <K> Map<K, List<String>> formatGroupMap(
-            Map<K, List<Person>> map,
-            Function<Person, String> mapper) {
+        Map<K, List<Person>> map,
+        Function<Person, String> mapper) {
         Map<K, List<String>> formatted = new LinkedHashMap<>();
         map.forEach((key, people) ->
-                formatted.put(key, people.stream()
-                        .map(mapper).toList()));
+            formatted.put(key, people.stream()
+                .map(mapper).toList()));
         return formatted;
     }
 }

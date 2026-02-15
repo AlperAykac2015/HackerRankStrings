@@ -8,20 +8,20 @@ package com.aykacltd.stream;
  * exercises for salary analytics, department-level grouping, and
  * experience-based filtering.</p>
  *
- * @param title            the job title (e.g. "Senior Developer")
- * @param department       the organisational department (e.g. "Engineering")
- * @param company          the employer name
- * @param yearsExperience  total years of professional experience
- * @param salary           current annual salary in GBP
- * @param status           the employment status
+ * @param title           the job title (e.g. "Senior Developer")
+ * @param department      the organisational department (e.g. "Engineering")
+ * @param company         the employer name
+ * @param yearsExperience total years of professional experience
+ * @param salary          current annual salary in GBP
+ * @param status          the employment status
  */
 public record Profession(
-        String title,
-        String department,
-        String company,
-        int yearsExperience,
-        double salary,
-        EmploymentStatus status
+    String title,
+    String department,
+    String company,
+    int yearsExperience,
+    double salary,
+    EmploymentStatus status
 ) {
 
     /**

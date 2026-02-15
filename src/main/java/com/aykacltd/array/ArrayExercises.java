@@ -1,7 +1,19 @@
 package com.aykacltd.array;
 
-import java.util.*;
-import java.util.stream.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.IntSummaryStatistics;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * <h1>Java Arrays — 1D Operations Comprehensive Guide</h1>
@@ -158,14 +170,14 @@ public class ArrayExercises {
         boolean[] falses = new boolean[3]; // all false
 
         // new + inline
-        int[] inline = new int[]{1, 2, 3};
+        int[] inline = new int[] {1, 2, 3};
 
         // From stream
         int[] fromStream = IntStream.rangeClosed(1, 10).toArray();
 
         // From generator
-        int[] generated = IntStream.generate(() -> (int)(Math.random() * 100))
-                .limit(5).toArray();
+        int[] generated = IntStream.generate(() -> (int) (Math.random() * 100))
+            .limit(5).toArray();
 
         // From function
         int[] fromFunction = IntStream.iterate(1, n -> n * 2).limit(8).toArray();
@@ -281,8 +293,8 @@ public class ArrayExercises {
         // Stream approach (creates new array)
         int[] original = {1, 2, 3, 4, 5};
         int[] rotated = IntStream.concat(
-                IntStream.of(Arrays.copyOfRange(original, 1, original.length)),
-                IntStream.of(original[0])
+            IntStream.of(Arrays.copyOfRange(original, 1, original.length)),
+            IntStream.of(original[0])
         ).toArray();
         print("    Stream rotate left", rotated);
     }
@@ -318,15 +330,15 @@ public class ArrayExercises {
 
         // Stream approach: concat(subarray[k..n], subarray[0..k])
         int[] rotatedLeft = IntStream.concat(
-                Arrays.stream(arr, k, n),
-                Arrays.stream(arr, 0, k)
+            Arrays.stream(arr, k, n),
+            Arrays.stream(arr, 0, k)
         ).toArray();
 
         // Right rotation by K = left rotation by (n - k)
         int rightK = n - k;
         int[] rotatedRight = IntStream.concat(
-                Arrays.stream(arr, rightK, n),
-                Arrays.stream(arr, 0, rightK)
+            Arrays.stream(arr, rightK, n),
+            Arrays.stream(arr, 0, rightK)
         ).toArray();
 
         print("3.3 Original", arr);
@@ -393,14 +405,14 @@ public class ArrayExercises {
         int n = arr.length;
 
         int[] reversed = IntStream.rangeClosed(1, n)
-                .map(i -> arr[n - i])
-                .toArray();
+            .map(i -> arr[n - i])
+            .toArray();
 
         // For String/Object arrays, use boxed collections
         String[] words = {"alpha", "bravo", "charlie", "delta"};
         String[] reversedWords = IntStream.rangeClosed(1, words.length)
-                .mapToObj(i -> words[words.length - i])
-                .toArray(String[]::new);
+            .mapToObj(i -> words[words.length - i])
+            .toArray(String[]::new);
 
         print("4.2 Reversed (stream)", reversed);
         printExercise("    Reversed strings", Arrays.toString(reversedWords));
@@ -440,7 +452,7 @@ public class ArrayExercises {
 
         // Stream approach
         int[] merged = IntStream.concat(
-                Arrays.stream(a), Arrays.stream(b)
+            Arrays.stream(a), Arrays.stream(b)
         ).toArray();
 
         // System.arraycopy approach (no boxing, fast)
@@ -471,12 +483,16 @@ public class ArrayExercises {
         while (i < a.length && j < b.length) {
             merged[k++] = (a[i] <= b[j]) ? a[i++] : b[j++];
         }
-        while (i < a.length) merged[k++] = a[i++];
-        while (j < b.length) merged[k++] = b[j++];
+        while (i < a.length) {
+            merged[k++] = a[i++];
+        }
+        while (j < b.length) {
+            merged[k++] = b[j++];
+        }
 
         // Stream shortcut (sorts after concat, not a true merge)
         int[] streamMerge = IntStream.concat(
-                Arrays.stream(a), Arrays.stream(b)
+            Arrays.stream(a), Arrays.stream(b)
         ).sorted().toArray();
 
         print("5.2 Merge sorted (two-pointer)", merged);
@@ -493,12 +509,16 @@ public class ArrayExercises {
         int maxLen = Math.max(a.length, b.length);
 
         int[] interleaved = IntStream.range(0, maxLen)
-                .flatMap(i -> {
-                    IntStream.Builder builder = IntStream.builder();
-                    if (i < a.length) builder.accept(a[i]);
-                    if (i < b.length) builder.accept(b[i]);
-                    return builder.build();
-                }).toArray();
+            .flatMap(i -> {
+                IntStream.Builder builder = IntStream.builder();
+                if (i < a.length) {
+                    builder.accept(a[i]);
+                }
+                if (i < b.length) {
+                    builder.accept(b[i]);
+                }
+                return builder.build();
+            }).toArray();
 
         print("5.3 Interleaved", interleaved);
     }
@@ -511,9 +531,9 @@ public class ArrayExercises {
         int[] b = {2, 4, 5, 6, 8};
 
         int[] merged = IntStream.concat(Arrays.stream(a), Arrays.stream(b))
-                .distinct()
-                .sorted()
-                .toArray();
+            .distinct()
+            .sorted()
+            .toArray();
 
         print("5.4 Merged without duplicates", merged);
     }
@@ -551,7 +571,8 @@ public class ArrayExercises {
         int[][] a = {{1, 2}, {3, 4}};
         int[][] b = {{1, 2}, {3, 4}};
 
-        printExercise("6.2 Arrays.equals(2D, 2D)", Arrays.equals(a, b) + " (WRONG — compares refs)");
+        printExercise("6.2 Arrays.equals(2D, 2D)",
+            Arrays.equals(a, b) + " (WRONG — compares refs)");
         printExercise("    Arrays.deepEquals(2D, 2D)", Arrays.deepEquals(a, b) + " (CORRECT)");
     }
 
@@ -579,14 +600,14 @@ public class ArrayExercises {
 
         // Find indices where elements differ
         int[] diffIndices = IntStream.range(0, Math.min(a.length, b.length))
-                .filter(i -> a[i] != b[i])
-                .toArray();
+            .filter(i -> a[i] != b[i])
+            .toArray();
 
         // Create diff report
         String report = IntStream.range(0, Math.min(a.length, b.length))
-                .filter(i -> a[i] != b[i])
-                .mapToObj(i -> "index %d: %d vs %d".formatted(i, a[i], b[i]))
-                .collect(Collectors.joining(", "));
+            .filter(i -> a[i] != b[i])
+            .mapToObj(i -> "index %d: %d vs %d".formatted(i, a[i], b[i]))
+            .collect(Collectors.joining(", "));
 
         print("6.4 Diff indices", diffIndices);
         printExercise("    Diff report", report);
@@ -604,9 +625,9 @@ public class ArrayExercises {
         int[] b = {3, 4, 5, 6, 7};
 
         int[] union = IntStream.concat(Arrays.stream(a), Arrays.stream(b))
-                .distinct()
-                .sorted()
-                .toArray();
+            .distinct()
+            .sorted()
+            .toArray();
 
         print("7.1 Union", union);
     }
@@ -620,10 +641,10 @@ public class ArrayExercises {
 
         Set<Integer> setB = Arrays.stream(b).boxed().collect(Collectors.toSet());
         int[] intersection = Arrays.stream(a)
-                .filter(setB::contains)
-                .distinct()
-                .sorted()
-                .toArray();
+            .filter(setB::contains)
+            .distinct()
+            .sorted()
+            .toArray();
 
         print("7.2 Intersection", intersection);
     }
@@ -637,13 +658,13 @@ public class ArrayExercises {
 
         Set<Integer> setB = Arrays.stream(b).boxed().collect(Collectors.toSet());
         int[] difference = Arrays.stream(a)
-                .filter(x -> !setB.contains(x))
-                .toArray();
+            .filter(x -> !setB.contains(x))
+            .toArray();
 
         Set<Integer> setA = Arrays.stream(a).boxed().collect(Collectors.toSet());
         int[] bMinusA = Arrays.stream(b)
-                .filter(x -> !setA.contains(x))
-                .toArray();
+            .filter(x -> !setA.contains(x))
+            .toArray();
 
         print("7.3 A − B (in A, not B)", difference);
         print("    B − A (in B, not A)", bMinusA);
@@ -660,8 +681,8 @@ public class ArrayExercises {
         Set<Integer> setB = Arrays.stream(b).boxed().collect(Collectors.toSet());
 
         int[] symDiff = IntStream.concat(
-                Arrays.stream(a).filter(x -> !setB.contains(x)),
-                Arrays.stream(b).filter(x -> !setA.contains(x))
+            Arrays.stream(a).filter(x -> !setB.contains(x)),
+            Arrays.stream(b).filter(x -> !setA.contains(x))
         ).sorted().toArray();
 
         print("7.4 Symmetric diff (A △ B)", symDiff);
@@ -679,17 +700,17 @@ public class ArrayExercises {
         Set<Integer> setC = Arrays.stream(c).boxed().collect(Collectors.toSet());
 
         int[] common = Arrays.stream(a)
-                .filter(x -> setB.contains(x) && setC.contains(x))
-                .toArray();
+            .filter(x -> setB.contains(x) && setC.contains(x))
+            .toArray();
 
         // Generic approach for N arrays using reduce
         int[][] allArrays = {a, b, c};
         Optional<Set<Integer>> commonAll = Arrays.stream(allArrays)
-                .map(arr -> Arrays.stream(arr).boxed().collect(Collectors.toSet()))
-                .reduce((s1, s2) -> {
-                    s1.retainAll(s2);
-                    return s1;
-                });
+            .map(arr -> Arrays.stream(arr).boxed().collect(Collectors.toSet()))
+            .reduce((s1, s2) -> {
+                s1.retainAll(s2);
+                return s1;
+            });
 
         print("7.5 Common across 3 arrays", common);
         printExercise("    Using reduce(retainAll)", commonAll.orElse(Set.of()));
@@ -707,11 +728,11 @@ public class ArrayExercises {
         int target = 22;
 
         OptionalInt index = IntStream.range(0, arr.length)
-                .filter(i -> arr[i] == target)
-                .findFirst();
+            .filter(i -> arr[i] == target)
+            .findFirst();
 
         printExercise("8.1 Linear search for " + target,
-                index.isPresent() ? "found at index " + index.getAsInt() : "not found");
+            index.isPresent() ? "found at index " + index.getAsInt() : "not found");
     }
 
     /**
@@ -729,7 +750,8 @@ public class ArrayExercises {
         int notFound = Arrays.binarySearch(sorted, 35);
 
         printExercise("8.2 binarySearch(40)", "index " + found);
-        printExercise("    binarySearch(35)", notFound + " (insertion point = " + (-(notFound) - 1) + ")");
+        printExercise("    binarySearch(35)",
+            notFound + " (insertion point = " + (-(notFound) - 1) + ")");
     }
 
     /**
@@ -755,12 +777,12 @@ public class ArrayExercises {
         int target = 3;
 
         int first = IntStream.range(0, arr.length)
-                .filter(i -> arr[i] == target)
-                .findFirst().orElse(-1);
+            .filter(i -> arr[i] == target)
+            .findFirst().orElse(-1);
 
         int last = IntStream.iterate(arr.length - 1, i -> i >= 0, i -> i - 1)
-                .filter(i -> arr[i] == target)
-                .findFirst().orElse(-1);
+            .filter(i -> arr[i] == target)
+            .findFirst().orElse(-1);
 
         printExercise("8.4 First occurrence of " + target, "index " + first);
         printExercise("    Last occurrence of " + target, "index " + last);
@@ -775,10 +797,10 @@ public class ArrayExercises {
 
         int kthSmallest = Arrays.stream(arr).sorted().skip(k - 1).findFirst().orElseThrow();
         int kthLargest = Arrays.stream(arr)
-                .boxed()
-                .sorted(Comparator.reverseOrder())
-                .skip(k - 1)
-                .findFirst().orElseThrow();
+            .boxed()
+            .sorted(Comparator.reverseOrder())
+            .skip(k - 1)
+            .findFirst().orElseThrow();
 
         printExercise("8.5 " + k + "rd smallest", kthSmallest);
         printExercise("    " + k + "rd largest", kthLargest);
@@ -800,7 +822,7 @@ public class ArrayExercises {
 
         int sum = Arrays.stream(arr).sum();
         long product = Arrays.stream(arr).asLongStream()
-                .reduce(1L, (a, b) -> a * b);
+            .reduce(1L, (a, b) -> a * b);
 
         printExercise("9.1 Sum", sum);
         printExercise("    Product", product);
@@ -829,9 +851,9 @@ public class ArrayExercises {
         IntSummaryStatistics stats = Arrays.stream(arr).summaryStatistics();
 
         printExercise("9.3 SummaryStatistics",
-                "count=%d, sum=%d, min=%d, max=%d, avg=%.2f"
-                        .formatted(stats.getCount(), (long) stats.getSum(),
-                                stats.getMin(), stats.getMax(), stats.getAverage()));
+            "count=%d, sum=%d, min=%d, max=%d, avg=%.2f"
+                .formatted(stats.getCount(), (long) stats.getSum(),
+                    stats.getMin(), stats.getMax(), stats.getAverage()));
     }
 
     /**
@@ -851,7 +873,7 @@ public class ArrayExercises {
         // Stream approach (not in-place)
         int[] streamCumSum = new int[arr.length];
         IntStream.range(0, arr.length).forEach(i ->
-                streamCumSum[i] = (i == 0) ? arr[0] : streamCumSum[i - 1] + arr[i]);
+            streamCumSum[i] = (i == 0) ? arr[0] : streamCumSum[i - 1] + arr[i]);
 
         print("9.4 Cumulative sum (parallelPrefix)", cumSum);
         print("    Cumulative sum (stream)", streamCumSum);
@@ -865,8 +887,8 @@ public class ArrayExercises {
         int[] b = {5, 6, 7, 8};
 
         int dot = IntStream.range(0, Math.min(a.length, b.length))
-                .map(i -> a[i] * b[i])
-                .sum();
+            .map(i -> a[i] * b[i])
+            .sum();
 
         printExercise("9.5 Dot product", dot + " (1×5 + 2×6 + 3×7 + 4×8)");
     }
@@ -883,8 +905,8 @@ public class ArrayExercises {
         double range = max - min;
 
         double[] normalised = Arrays.stream(arr)
-                .mapToDouble(x -> (x - min) / range)
-                .toArray();
+            .mapToDouble(x -> (x - min) / range)
+            .toArray();
 
         printExercise("9.6 Normalised [0,1]", Arrays.toString(normalised));
     }
@@ -899,7 +921,8 @@ public class ArrayExercises {
         int[] addition = IntStream.range(0, a.length).map(i -> a[i] + b[i]).toArray();
         int[] subtraction = IntStream.range(0, a.length).map(i -> a[i] - b[i]).toArray();
         int[] multiplication = IntStream.range(0, a.length).map(i -> a[i] * b[i]).toArray();
-        double[] division = IntStream.range(0, a.length).mapToDouble(i -> (double) a[i] / b[i]).toArray();
+        double[] division =
+            IntStream.range(0, a.length).mapToDouble(i -> (double) a[i] / b[i]).toArray();
 
         print("9.7 a + b", addition);
         print("    a - b", subtraction);
@@ -916,8 +939,8 @@ public class ArrayExercises {
         int range = Arrays.stream(arr).max().orElse(0) - Arrays.stream(arr).min().orElse(0);
         double mean = Arrays.stream(arr).average().orElse(0);
         double variance = Arrays.stream(arr)
-                .mapToDouble(x -> Math.pow(x - mean, 2))
-                .average().orElse(0);
+            .mapToDouble(x -> Math.pow(x - mean, 2))
+            .average().orElse(0);
         double stdDev = Math.sqrt(variance);
 
         printExercise("9.8 Range", range);
@@ -965,10 +988,10 @@ public class ArrayExercises {
         int rangeSum = prefix[to + 1] - prefix[from];
 
         printExercise("10.2 Range sum [%d..%d]".formatted(from, to),
-                "%d (=%s)".formatted(rangeSum,
-                        Arrays.stream(arr, from, to + 1)
-                                .mapToObj(String::valueOf)
-                                .collect(Collectors.joining("+"))));
+            "%d (=%s)".formatted(rangeSum,
+                Arrays.stream(arr, from, to + 1)
+                    .mapToObj(String::valueOf)
+                    .collect(Collectors.joining("+"))));
     }
 
     /**
@@ -981,8 +1004,8 @@ public class ArrayExercises {
         int k = 3;
 
         int[] windowMaxes = IntStream.rangeClosed(0, arr.length - k)
-                .map(i -> Arrays.stream(arr, i, i + k).max().orElse(0))
-                .toArray();
+            .map(i -> Arrays.stream(arr, i, i + k).max().orElse(0))
+            .toArray();
 
         print("10.3 Window max (k=%d)".formatted(k), windowMaxes);
     }
@@ -995,8 +1018,8 @@ public class ArrayExercises {
         int k = 3;
 
         double[] windowAvgs = IntStream.rangeClosed(0, arr.length - k)
-                .mapToDouble(i -> Arrays.stream(arr, i, i + k).average().orElse(0))
-                .toArray();
+            .mapToDouble(i -> Arrays.stream(arr, i, i + k).average().orElse(0))
+            .toArray();
 
         printExercise("10.4 Window avg (k=%d)".formatted(k), Arrays.toString(windowAvgs));
     }
@@ -1012,14 +1035,14 @@ public class ArrayExercises {
         int[] arr = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5};
 
         Map<Integer, Long> freq = Arrays.stream(arr)
-                .boxed()
-                .collect(Collectors.groupingBy(x -> x, Collectors.counting()));
+            .boxed()
+            .collect(Collectors.groupingBy(x -> x, Collectors.counting()));
 
         // Sorted by value descending
         String sorted = freq.entrySet().stream()
-                .sorted(Map.Entry.<Integer, Long>comparingByValue().reversed())
-                .map(e -> "%d→%d".formatted(e.getKey(), e.getValue()))
-                .collect(Collectors.joining(", "));
+            .sorted(Map.Entry.<Integer, Long>comparingByValue().reversed())
+            .map(e -> "%d→%d".formatted(e.getKey(), e.getValue()))
+            .collect(Collectors.joining(", "));
 
         printExercise("11.1 Frequencies", sorted);
     }
@@ -1032,9 +1055,9 @@ public class ArrayExercises {
 
         Set<Integer> seen = new HashSet<>();
         int[] duplicates = Arrays.stream(arr)
-                .filter(x -> !seen.add(x))  // add returns false if already present
-                .distinct()
-                .toArray();
+            .filter(x -> !seen.add(x))  // add returns false if already present
+            .distinct()
+            .toArray();
 
         print("11.2 Duplicates", duplicates);
     }
@@ -1087,11 +1110,11 @@ public class ArrayExercises {
         int[] arr = {3, 1, 4, 1, 5, 1, 2, 6, 5, 3, 5};
 
         int mostFrequent = Arrays.stream(arr).boxed()
-                .collect(Collectors.groupingBy(x -> x, Collectors.counting()))
-                .entrySet().stream()
-                .max(Map.Entry.comparingByValue())
-                .map(Map.Entry::getKey)
-                .orElseThrow();
+            .collect(Collectors.groupingBy(x -> x, Collectors.counting()))
+            .entrySet().stream()
+            .max(Map.Entry.comparingByValue())
+            .map(Map.Entry::getKey)
+            .orElseThrow();
 
         printExercise("11.6 Most frequent element", mostFrequent);
     }
@@ -1107,7 +1130,7 @@ public class ArrayExercises {
         int[] arr = {15, 22, 8, 37, 42, 3, 58, 19};
 
         Map<Boolean, List<Integer>> partitioned = Arrays.stream(arr).boxed()
-                .collect(Collectors.partitioningBy(x -> x >= 20));
+            .collect(Collectors.partitioningBy(x -> x >= 20));
 
         printExercise("12.1 Partition ≥ 20", "true=" + partitioned.get(true));
         printExercise("    ", "false=" + partitioned.get(false));
@@ -1120,7 +1143,7 @@ public class ArrayExercises {
         int[] arr = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
 
         Map<Integer, List<Integer>> grouped = Arrays.stream(arr).boxed()
-                .collect(Collectors.groupingBy(x -> x % 3));
+            .collect(Collectors.groupingBy(x -> x % 3));
 
         printExercise("12.2 Group by mod 3", grouped);
     }
@@ -1135,8 +1158,8 @@ public class ArrayExercises {
         int chunkSize = 3;
 
         List<int[]> chunks = IntStream.iterate(0, i -> i < arr.length, i -> i + chunkSize)
-                .mapToObj(i -> Arrays.copyOfRange(arr, i, Math.min(i + chunkSize, arr.length)))
-                .toList();
+            .mapToObj(i -> Arrays.copyOfRange(arr, i, Math.min(i + chunkSize, arr.length)))
+            .toList();
 
         System.out.println("  ► 12.3 Chunks of " + chunkSize + ":");
         chunks.forEach(chunk -> System.out.println("    " + Arrays.toString(chunk)));
@@ -1171,8 +1194,8 @@ public class ArrayExercises {
 
         int[] asc = Arrays.stream(arr).sorted().toArray();
         int[] desc = Arrays.stream(arr).boxed()
-                .sorted(Comparator.reverseOrder())
-                .mapToInt(Integer::intValue).toArray();
+            .sorted(Comparator.reverseOrder())
+            .mapToInt(Integer::intValue).toArray();
 
         print("13.1 Ascending", asc);
         print("     Descending", desc);
@@ -1185,8 +1208,8 @@ public class ArrayExercises {
         int[] arr = {-5, 3, -8, 1, -9, 2, -7};
 
         int[] sorted = Arrays.stream(arr).boxed()
-                .sorted(Comparator.comparingInt(Math::abs))
-                .mapToInt(Integer::intValue).toArray();
+            .sorted(Comparator.comparingInt(Math::abs))
+            .mapToInt(Integer::intValue).toArray();
 
         print("13.2 Sorted by |value|", sorted);
     }
@@ -1198,12 +1221,12 @@ public class ArrayExercises {
         int[] arr = {3, 1, 4, 1, 5, 1, 2, 5, 3};
 
         Map<Integer, Long> freq = Arrays.stream(arr).boxed()
-                .collect(Collectors.groupingBy(x -> x, Collectors.counting()));
+            .collect(Collectors.groupingBy(x -> x, Collectors.counting()));
 
         int[] sorted = Arrays.stream(arr).boxed()
-                .sorted(Comparator.<Integer, Long>comparing(freq::get).reversed()
-                        .thenComparing(Comparator.naturalOrder()))
-                .mapToInt(Integer::intValue).toArray();
+            .sorted(Comparator.<Integer, Long>comparing(freq::get).reversed()
+                .thenComparing(Comparator.naturalOrder()))
+            .mapToInt(Integer::intValue).toArray();
 
         print("13.3 Sorted by frequency", sorted);
     }
@@ -1223,9 +1246,13 @@ public class ArrayExercises {
 
         while (mid <= high) {
             switch (arr[mid]) {
-                case 0 -> { swap(arr, low++, mid++); }
+                case 0 -> {
+                    swap(arr, low++, mid++);
+                }
                 case 1 -> mid++;
-                case 2 -> { swap(arr, mid, high--); }
+                case 2 -> {
+                    swap(arr, mid, high--);
+                }
             }
         }
 
@@ -1254,10 +1281,13 @@ public class ArrayExercises {
             int sum = arr[left] + arr[right];
             if (sum == target) {
                 result = "%d + %d = %d (indices %d, %d)".formatted(
-                        arr[left], arr[right], target, left, right);
+                    arr[left], arr[right], target, left, right);
                 break;
-            } else if (sum < target) left++;
-            else right--;
+            } else if (sum < target) {
+                left++;
+            } else {
+                right--;
+            }
         }
 
         printExercise("14.1 Two-sum (target=" + target + ")", result);
@@ -1273,9 +1303,13 @@ public class ArrayExercises {
         int insertPos = 0;
 
         for (int num : arr) {
-            if (num != 0) arr[insertPos++] = num;
+            if (num != 0) {
+                arr[insertPos++] = num;
+            }
         }
-        while (insertPos < arr.length) arr[insertPos++] = 0;
+        while (insertPos < arr.length) {
+            arr[insertPos++] = 0;
+        }
 
         print("14.2 Move zeroes to end", arr);
     }
@@ -1287,12 +1321,14 @@ public class ArrayExercises {
         int[] arr = {1, 1, 2, 2, 2, 3, 4, 4, 5};
         int slow = 0;
         for (int fast = 1; fast < arr.length; fast++) {
-            if (arr[fast] != arr[slow]) arr[++slow] = arr[fast];
+            if (arr[fast] != arr[slow]) {
+                arr[++slow] = arr[fast];
+            }
         }
         int newLength = slow + 1;
 
         print("14.3 Dedup in-place (len=%d)".formatted(newLength),
-                Arrays.copyOf(arr, newLength));
+            Arrays.copyOf(arr, newLength));
     }
 
     /**
@@ -1306,10 +1342,10 @@ public class ArrayExercises {
         int pivot = 5;
 
         int[] partitioned = IntStream.concat(
-                IntStream.concat(
-                        Arrays.stream(arr).filter(x -> x < pivot),
-                        Arrays.stream(arr).filter(x -> x == pivot)),
-                Arrays.stream(arr).filter(x -> x > pivot)
+            IntStream.concat(
+                Arrays.stream(arr).filter(x -> x < pivot),
+                Arrays.stream(arr).filter(x -> x == pivot)),
+            Arrays.stream(arr).filter(x -> x > pivot)
         ).toArray();
 
         print("14.4 Partition around pivot=" + pivot, partitioned);
@@ -1422,7 +1458,7 @@ public class ArrayExercises {
 
         // Ordered set
         Set<Integer> orderedSet = Arrays.stream(arr).boxed()
-                .collect(Collectors.toCollection(TreeSet::new));
+            .collect(Collectors.toCollection(TreeSet::new));
 
         // Set → Array
         int[] fromSet = set.stream().mapToInt(Integer::intValue).toArray();
@@ -1445,7 +1481,9 @@ public class ArrayExercises {
     }
 
     private static void swap(int[] arr, int i, int j) {
-        int temp = arr[i]; arr[i] = arr[j]; arr[j] = temp;
+        int temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
     }
 
     private static void print(String label, int[] arr) {

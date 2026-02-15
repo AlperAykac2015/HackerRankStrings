@@ -35,14 +35,14 @@ public class CharacterFrequency {
     return frequency;
   }
 
-  public  Map<Character, Integer> countCharactersEfficiently(String s) {
+  public Map<Character, Integer> countCharactersEfficiently(String s) {
     boolean[] seen = new boolean[65536];
     Map<Character, Integer> result = new HashMap<>();
     for (int i = 0; i < s.length(); i++) {
       char c = s.charAt(i);
       if (!seen[c]) {
         seen[c] = true;
-        result.put(c,1);
+        result.put(c, 1);
       } else {
         result.put(c, result.get(c) + 1);
       }

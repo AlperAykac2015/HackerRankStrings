@@ -15,11 +15,11 @@ package com.aykacltd.stream;
  * @param type     the classification of this address
  */
 public record Address(
-        String street,
-        String city,
-        String country,
-        String postCode,
-        AddressType type
+    String street,
+    String city,
+    String country,
+    String postCode,
+    AddressType type
 ) {
 
     /**

@@ -31,13 +31,6 @@ public class Person {
     private final Profession profession;
     private final List<Skill> skills;
 
-    /**
-     * Gender classification used for demographic grouping exercises.
-     */
-    public enum Gender {
-        MALE, FEMALE, NON_BINARY
-    }
-
     private Person(Builder builder) {
         this.firstName = Objects.requireNonNull(builder.firstName);
         this.lastName = Objects.requireNonNull(builder.lastName);
@@ -49,17 +42,47 @@ public class Person {
         this.skills = builder.skills == null ? List.of() : List.copyOf(builder.skills);
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     // ───────── Getters ─────────
 
-    public String getFirstName() { return firstName; }
-    public String getLastName()  { return lastName; }
-    public String getFullName()  { return firstName + " " + lastName; }
-    public LocalDate getDateOfBirth() { return dateOfBirth; }
-    public Gender getGender() { return gender; }
-    public String getEmail() { return email; }
-    public List<Address> getAddresses() { return addresses; }
-    public Profession getProfession() { return profession; }
-    public List<Skill> getSkills() { return skills; }
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
+
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public List<Address> getAddresses() {
+        return addresses;
+    }
+
+    public Profession getProfession() {
+        return profession;
+    }
+
+    public List<Skill> getSkills() {
+        return skills;
+    }
 
     // ───────── Computed Properties ─────────
 
@@ -80,10 +103,10 @@ public class Person {
      */
     public String getHomeCity() {
         return addresses.stream()
-                .filter(a -> a.type() == Address.AddressType.HOME)
-                .map(Address::city)
-                .findFirst()
-                .orElse("Unknown");
+            .filter(a -> a.type() == Address.AddressType.HOME)
+            .map(Address::city)
+            .findFirst()
+            .orElse("Unknown");
     }
 
     /**
@@ -94,21 +117,28 @@ public class Person {
      */
     public String getHomeCountry() {
         return addresses.stream()
-                .filter(a -> a.type() == Address.AddressType.HOME)
-                .map(Address::country)
-                .findFirst()
-                .orElse("Unknown");
+            .filter(a -> a.type() == Address.AddressType.HOME)
+            .map(Address::country)
+            .findFirst()
+            .orElse("Unknown");
     }
 
     @Override
     public String toString() {
         return "Person{name='%s %s', age=%d, profession=%s, city=%s}"
-                .formatted(firstName, lastName, getAge(),
-                        profession != null ? profession.title() : "N/A",
-                        getHomeCity());
+            .formatted(firstName, lastName, getAge(),
+                profession != null ? profession.title() : "N/A",
+                getHomeCity());
     }
 
     // ───────── Builder ─────────
+
+    /**
+     * Gender classification used for demographic grouping exercises.
+     */
+    public enum Gender {
+        MALE, FEMALE, NON_BINARY
+    }
 
     /**
      * Fluent builder for constructing {@link Person} instances.
@@ -123,17 +153,48 @@ public class Person {
         private Profession profession;
         private List<Skill> skills;
 
-        public Builder firstName(String firstName)       { this.firstName = firstName; return this; }
-        public Builder lastName(String lastName)          { this.lastName = lastName; return this; }
-        public Builder dateOfBirth(LocalDate dateOfBirth) { this.dateOfBirth = dateOfBirth; return this; }
-        public Builder gender(Gender gender)              { this.gender = gender; return this; }
-        public Builder email(String email)                { this.email = email; return this; }
-        public Builder addresses(List<Address> addresses) { this.addresses = addresses; return this; }
-        public Builder profession(Profession profession)  { this.profession = profession; return this; }
-        public Builder skills(List<Skill> skills)         { this.skills = skills; return this; }
+        public Builder firstName(String firstName) {
+            this.firstName = firstName;
+            return this;
+        }
 
-        public Person build() { return new Person(this); }
+        public Builder lastName(String lastName) {
+            this.lastName = lastName;
+            return this;
+        }
+
+        public Builder dateOfBirth(LocalDate dateOfBirth) {
+            this.dateOfBirth = dateOfBirth;
+            return this;
+        }
+
+        public Builder gender(Gender gender) {
+            this.gender = gender;
+            return this;
+        }
+
+        public Builder email(String email) {
+            this.email = email;
+            return this;
+        }
+
+        public Builder addresses(List<Address> addresses) {
+            this.addresses = addresses;
+            return this;
+        }
+
+        public Builder profession(Profession profession) {
+            this.profession = profession;
+            return this;
+        }
+
+        public Builder skills(List<Skill> skills) {
+            this.skills = skills;
+            return this;
+        }
+
+        public Person build() {
+            return new Person(this);
+        }
     }
-
-    public static Builder builder() { return new Builder(); }
 }

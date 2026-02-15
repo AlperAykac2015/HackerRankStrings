@@ -1,7 +1,15 @@
 package com.aykacltd.array;
 
-import java.util.*;
-import java.util.stream.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TreeMap;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * <h1>Java Arrays — Interval Operations Comprehensive Guide</h1>
@@ -28,63 +36,6 @@ import java.util.stream.*;
  * @author Interval Exercise Suite
  */
 public class ArrayIntervalExercises {
-
-    /**
-     * Represents a closed interval [start, end].
-     *
-     * <p>Using a record for immutability and built-in toString/equals.
-     * Implements {@link Comparable} for natural ordering by start time.</p>
-     *
-     * @param start the inclusive lower bound
-     * @param end   the inclusive upper bound
-     */
-    record Interval(int start, int end) implements Comparable<Interval> {
-        Interval {
-            if (start > end) throw new IllegalArgumentException(
-                    "start (%d) > end (%d)".formatted(start, end));
-        }
-
-        /** Returns true if this interval overlaps with other. */
-        boolean overlaps(Interval other) {
-            return this.start <= other.end && other.start <= this.end;
-        }
-
-        /** Returns true if this interval fully contains other. */
-        boolean contains(Interval other) {
-            return this.start <= other.start && this.end >= other.end;
-        }
-
-        /** Returns true if this interval contains the given point. */
-        boolean containsPoint(int point) {
-            return start <= point && point <= end;
-        }
-
-        /** Merges this interval with an overlapping interval. */
-        Interval merge(Interval other) {
-            return new Interval(Math.min(start, other.start), Math.max(end, other.end));
-        }
-
-        /** Returns the intersection with another interval, or empty if none. */
-        Optional<Interval> intersect(Interval other) {
-            int lo = Math.max(start, other.start);
-            int hi = Math.min(end, other.end);
-            return lo <= hi ? Optional.of(new Interval(lo, hi)) : Optional.empty();
-        }
-
-        /** Returns the length/size of this interval. */
-        int length() { return end - start; }
-
-        @Override
-        public int compareTo(Interval o) {
-            return start != o.start ? Integer.compare(start, o.start)
-                    : Integer.compare(end, o.end);
-        }
-
-        @Override
-        public String toString() {
-            return "[%d, %d]".formatted(start, end);
-        }
-    }
 
     public static void main(String[] args) {
         System.out.println("═══════════════════════════════════════════════════════════");
@@ -141,10 +92,6 @@ public class ArrayIntervalExercises {
         System.out.println("═══════════════════════════════════════════════════════════");
     }
 
-    // ═══════════════════════════════════════════════════════════════════
-    //  SECTION 1 — REPRESENTING INTERVALS
-    // ═══════════════════════════════════════════════════════════════════
-
     /**
      * Different ways to represent intervals in Java.
      *
@@ -165,8 +112,8 @@ public class ArrayIntervalExercises {
 
         // Convert 2D array to List<Interval>
         List<Interval> asList = Arrays.stream(intervals)
-                .map(arr -> new Interval(arr[0], arr[1]))
-                .toList();
+            .map(arr -> new Interval(arr[0], arr[1]))
+            .toList();
 
         printExercise("1.1 Record interval", iv);
         printExercise("    overlaps [3,7]?", iv.overlaps(new Interval(3, 7)));
@@ -174,6 +121,10 @@ public class ArrayIntervalExercises {
         printExercise("    length", iv.length());
         printExercise("    2D array → List<Interval>", asList);
     }
+
+    // ═══════════════════════════════════════════════════════════════════
+    //  SECTION 1 — REPRESENTING INTERVALS
+    // ═══════════════════════════════════════════════════════════════════
 
     /**
      * Converting between 2D int arrays and Interval records.
@@ -183,21 +134,17 @@ public class ArrayIntervalExercises {
 
         // int[][] → List<Interval>
         List<Interval> intervals = Arrays.stream(raw)
-                .map(a -> new Interval(a[0], a[1]))
-                .toList();
+            .map(a -> new Interval(a[0], a[1]))
+            .toList();
 
         // List<Interval> → int[][]
         int[][] backToArray = intervals.stream()
-                .map(iv -> new int[]{iv.start(), iv.end()})
-                .toArray(int[][]::new);
+            .map(iv -> new int[] {iv.start(), iv.end()})
+            .toArray(int[][]::new);
 
         printExercise("1.2 int[][] → Intervals", intervals);
         printExercise("    Back to int[][]", Arrays.deepToString(backToArray));
     }
-
-    // ═══════════════════════════════════════════════════════════════════
-    //  SECTION 2 — MERGE OVERLAPPING INTERVALS
-    // ═══════════════════════════════════════════════════════════════════
 
     /**
      * Merges all overlapping intervals in a list.
@@ -219,10 +166,10 @@ public class ArrayIntervalExercises {
      */
     static void mergeOverlapping() {
         List<Interval> input = List.of(
-                new Interval(1, 3),
-                new Interval(2, 6),
-                new Interval(8, 10),
-                new Interval(15, 18));
+            new Interval(1, 3),
+            new Interval(2, 6),
+            new Interval(8, 10),
+            new Interval(15, 18));
 
         List<Interval> merged = mergeIntervals(input);
 
@@ -231,20 +178,24 @@ public class ArrayIntervalExercises {
 
         // Edge case: all overlapping
         List<Interval> allOverlap = List.of(
-                new Interval(1, 4), new Interval(2, 5),
-                new Interval(3, 7), new Interval(6, 8));
+            new Interval(1, 4), new Interval(2, 5),
+            new Interval(3, 7), new Interval(6, 8));
         printExercise("    All overlapping", mergeIntervals(allOverlap));
 
         // Edge case: none overlapping
         List<Interval> noOverlap = List.of(
-                new Interval(1, 2), new Interval(5, 6), new Interval(9, 10));
+            new Interval(1, 2), new Interval(5, 6), new Interval(9, 10));
         printExercise("    None overlapping", mergeIntervals(noOverlap));
 
         // Edge case: touching at boundary
         List<Interval> touching = List.of(
-                new Interval(1, 3), new Interval(3, 5), new Interval(5, 7));
+            new Interval(1, 3), new Interval(3, 5), new Interval(5, 7));
         printExercise("    Touching at boundary", mergeIntervals(touching));
     }
+
+    // ═══════════════════════════════════════════════════════════════════
+    //  SECTION 2 — MERGE OVERLAPPING INTERVALS
+    // ═══════════════════════════════════════════════════════════════════
 
     /**
      * Same merge algorithm using raw 2D int arrays (interview style).
@@ -281,29 +232,28 @@ public class ArrayIntervalExercises {
      */
     static void mergeOverlappingStream() {
         List<Interval> input = List.of(
-                new Interval(1, 3), new Interval(2, 6),
-                new Interval(8, 10), new Interval(15, 18));
+            new Interval(1, 3), new Interval(2, 6),
+            new Interval(8, 10), new Interval(15, 18));
 
         List<Interval> merged = input.stream()
-                .sorted()
-                .reduce(
-                        new ArrayList<Interval>(),
-                        (acc, interval) -> {
-                            if (!acc.isEmpty() && acc.getLast().overlaps(interval)) {
-                                acc.set(acc.size() - 1, acc.getLast().merge(interval));
-                            } else {
-                                acc.add(interval);
-                            }
-                            return acc;
-                        },
-                        (a, b) -> { a.addAll(b); return a; });
+            .sorted()
+            .reduce(
+                new ArrayList<Interval>(),
+                (acc, interval) -> {
+                    if (!acc.isEmpty() && acc.getLast().overlaps(interval)) {
+                        acc.set(acc.size() - 1, acc.getLast().merge(interval));
+                    } else {
+                        acc.add(interval);
+                    }
+                    return acc;
+                },
+                (a, b) -> {
+                    a.addAll(b);
+                    return a;
+                });
 
         printExercise("2.3 Merge (stream reduce)", merged);
     }
-
-    // ═══════════════════════════════════════════════════════════════════
-    //  SECTION 3 — INSERT INTO SORTED LIST
-    // ═══════════════════════════════════════════════════════════════════
 
     /**
      * Inserts a new interval into a sorted, non-overlapping list
@@ -311,7 +261,7 @@ public class ArrayIntervalExercises {
      */
     static void insertInterval() {
         List<Interval> sorted = new ArrayList<>(List.of(
-                new Interval(1, 3), new Interval(6, 9), new Interval(12, 15)));
+            new Interval(1, 3), new Interval(6, 9), new Interval(12, 15)));
         Interval toInsert = new Interval(4, 5);
 
         // Find the insertion point using binary search on start values
@@ -323,6 +273,10 @@ public class ArrayIntervalExercises {
 
         printExercise("3.1 Insert [4,5] (no merge)", sorted);
     }
+
+    // ═══════════════════════════════════════════════════════════════════
+    //  SECTION 3 — INSERT INTO SORTED LIST
+    // ═══════════════════════════════════════════════════════════════════
 
     /**
      * Inserts a new interval and merges any resulting overlaps.
@@ -345,7 +299,7 @@ public class ArrayIntervalExercises {
      */
     static void insertAndMerge() {
         List<Interval> intervals = List.of(
-                new Interval(1, 3), new Interval(6, 9), new Interval(12, 15));
+            new Interval(1, 3), new Interval(6, 9), new Interval(12, 15));
         Interval newIv = new Interval(2, 7);
 
         List<Interval> result = new ArrayList<>();
@@ -371,10 +325,6 @@ public class ArrayIntervalExercises {
         printExercise("3.2 Insert [2,7] and merge", result);
     }
 
-    // ═══════════════════════════════════════════════════════════════════
-    //  SECTION 4 — INTERSECTION
-    // ═══════════════════════════════════════════════════════════════════
-
     /**
      * Finds the intersection of two lists of sorted intervals.
      *
@@ -393,11 +343,11 @@ public class ArrayIntervalExercises {
      */
     static void intersectTwoLists() {
         List<Interval> a = List.of(
-                new Interval(0, 2), new Interval(5, 10),
-                new Interval(13, 23), new Interval(24, 25));
+            new Interval(0, 2), new Interval(5, 10),
+            new Interval(13, 23), new Interval(24, 25));
         List<Interval> b = List.of(
-                new Interval(1, 5), new Interval(8, 12),
-                new Interval(15, 24), new Interval(25, 26));
+            new Interval(1, 5), new Interval(8, 12),
+            new Interval(15, 24), new Interval(25, 26));
 
         List<Interval> intersection = new ArrayList<>();
         int i = 0, j = 0;
@@ -408,14 +358,21 @@ public class ArrayIntervalExercises {
                 intersection.add(new Interval(lo, hi));
             }
             // Advance the pointer whose interval ends first
-            if (a.get(i).end() < b.get(j).end()) i++;
-            else j++;
+            if (a.get(i).end() < b.get(j).end()) {
+                i++;
+            } else {
+                j++;
+            }
         }
 
         printExercise("4.1 List A", a);
         printExercise("    List B", b);
         printExercise("    Intersection", intersection);
     }
+
+    // ═══════════════════════════════════════════════════════════════════
+    //  SECTION 4 — INTERSECTION
+    // ═══════════════════════════════════════════════════════════════════
 
     /**
      * Interval intersection using Stream + flatMap.
@@ -425,18 +382,14 @@ public class ArrayIntervalExercises {
         List<Interval> b = List.of(new Interval(3, 7), new Interval(10, 15));
 
         List<Interval> intersection = a.stream()
-                .flatMap(iv1 -> b.stream()
-                        .map(iv1::intersect)
-                        .filter(Optional::isPresent)
-                        .map(Optional::get))
-                .toList();
+            .flatMap(iv1 -> b.stream()
+                .map(iv1::intersect)
+                .filter(Optional::isPresent)
+                .map(Optional::get))
+            .toList();
 
         printExercise("4.2 Stream intersection", intersection);
     }
-
-    // ═══════════════════════════════════════════════════════════════════
-    //  SECTION 5 — UNION OF TWO INTERVAL LISTS
-    // ═══════════════════════════════════════════════════════════════════
 
     /**
      * Merges (unions) two sorted interval lists into one merged list.
@@ -449,7 +402,7 @@ public class ArrayIntervalExercises {
         List<Interval> b = List.of(new Interval(2, 5), new Interval(7, 12));
 
         List<Interval> union = mergeIntervals(
-                Stream.concat(a.stream(), b.stream()).toList());
+            Stream.concat(a.stream(), b.stream()).toList());
 
         printExercise("5.1 List A", a);
         printExercise("    List B", b);
@@ -457,7 +410,7 @@ public class ArrayIntervalExercises {
     }
 
     // ═══════════════════════════════════════════════════════════════════
-    //  SECTION 6 — FINDING GAPS
+    //  SECTION 5 — UNION OF TWO INTERVAL LISTS
     // ═══════════════════════════════════════════════════════════════════
 
     /**
@@ -474,21 +427,25 @@ public class ArrayIntervalExercises {
      */
     static void findGapsBetweenIntervals() {
         List<Interval> intervals = List.of(
-                new Interval(1, 5), new Interval(3, 7),
-                new Interval(10, 14), new Interval(18, 22));
+            new Interval(1, 5), new Interval(3, 7),
+            new Interval(10, 14), new Interval(18, 22));
 
         List<Interval> merged = mergeIntervals(intervals);
 
         List<Interval> gaps = IntStream.range(0, merged.size() - 1)
-                .filter(i -> merged.get(i).end() + 1 < merged.get(i + 1).start())
-                .mapToObj(i -> new Interval(
-                        merged.get(i).end() + 1,
-                        merged.get(i + 1).start() - 1))
-                .toList();
+            .filter(i -> merged.get(i).end() + 1 < merged.get(i + 1).start())
+            .mapToObj(i -> new Interval(
+                merged.get(i).end() + 1,
+                merged.get(i + 1).start() - 1))
+            .toList();
 
         printExercise("6.1 Merged", merged);
         printExercise("    Gaps", gaps);
     }
+
+    // ═══════════════════════════════════════════════════════════════════
+    //  SECTION 6 — FINDING GAPS
+    // ═══════════════════════════════════════════════════════════════════
 
     /**
      * Finds gaps within a given coverage range [min, max].
@@ -499,8 +456,8 @@ public class ArrayIntervalExercises {
     static void findGapsCoverage() {
         int coverageStart = 0, coverageEnd = 24;
         List<Interval> booked = List.of(
-                new Interval(1, 3), new Interval(5, 8),
-                new Interval(10, 12), new Interval(15, 20));
+            new Interval(1, 3), new Interval(5, 8),
+            new Interval(10, 12), new Interval(15, 20));
 
         List<Interval> merged = mergeIntervals(booked);
         List<Interval> gaps = new ArrayList<>();
@@ -520,10 +477,6 @@ public class ArrayIntervalExercises {
         printExercise("    Free gaps", gaps);
     }
 
-    // ═══════════════════════════════════════════════════════════════════
-    //  SECTION 7 — COVERING & OVERLAP COUNT
-    // ═══════════════════════════════════════════════════════════════════
-
     /**
      * Counts how many intervals overlap at each critical point.
      *
@@ -538,8 +491,8 @@ public class ArrayIntervalExercises {
      */
     static void countOverlapsAtEachPoint() {
         List<Interval> intervals = List.of(
-                new Interval(1, 4), new Interval(2, 6),
-                new Interval(3, 5), new Interval(7, 9));
+            new Interval(1, 4), new Interval(2, 6),
+            new Interval(3, 5), new Interval(7, 9));
 
         // Build event map: point → delta
         TreeMap<Integer, Integer> events = new TreeMap<>();
@@ -554,9 +507,13 @@ public class ArrayIntervalExercises {
         for (var entry : events.entrySet()) {
             count += entry.getValue();
             System.out.println("    Point %2d: %d overlapping interval(s) %s"
-                    .formatted(entry.getKey(), count, "█".repeat(count)));
+                .formatted(entry.getKey(), count, "█".repeat(count)));
         }
     }
+
+    // ═══════════════════════════════════════════════════════════════════
+    //  SECTION 7 — COVERING & OVERLAP COUNT
+    // ═══════════════════════════════════════════════════════════════════
 
     /**
      * Finds the maximum number of overlapping intervals at any point.
@@ -566,9 +523,9 @@ public class ArrayIntervalExercises {
      */
     static void maxOverlappingIntervals() {
         List<Interval> intervals = List.of(
-                new Interval(1, 5), new Interval(2, 6),
-                new Interval(3, 7), new Interval(8, 10),
-                new Interval(4, 9));
+            new Interval(1, 5), new Interval(2, 6),
+            new Interval(3, 7), new Interval(8, 10),
+            new Interval(4, 9));
 
         TreeMap<Integer, Integer> events = new TreeMap<>();
         intervals.forEach(iv -> {
@@ -598,12 +555,12 @@ public class ArrayIntervalExercises {
      */
     static void minIntervalsToRemoveForNoOverlap() {
         List<Interval> intervals = List.of(
-                new Interval(1, 2), new Interval(2, 3),
-                new Interval(3, 4), new Interval(1, 3));
+            new Interval(1, 2), new Interval(2, 3),
+            new Interval(3, 4), new Interval(1, 3));
 
         List<Interval> sorted = intervals.stream()
-                .sorted(Comparator.comparingInt(Interval::end))
-                .toList();
+            .sorted(Comparator.comparingInt(Interval::end))
+            .toList();
 
         int removals = 0;
         int lastEnd = Integer.MIN_VALUE;
@@ -622,10 +579,6 @@ public class ArrayIntervalExercises {
         printExercise("    Kept intervals", kept);
     }
 
-    // ═══════════════════════════════════════════════════════════════════
-    //  SECTION 8 — MEETING ROOMS / SCHEDULING
-    // ═══════════════════════════════════════════════════════════════════
-
     /**
      * Determines if a person can attend all meetings (no overlap).
      *
@@ -634,13 +587,19 @@ public class ArrayIntervalExercises {
      */
     static void canAttendAllMeetings() {
         List<Interval> meetings = List.of(
-                new Interval(0, 30), new Interval(5, 10), new Interval(15, 20));
+            new Interval(0, 30), new Interval(5, 10), new Interval(15, 20));
         List<Interval> noConflict = List.of(
-                new Interval(0, 5), new Interval(6, 10), new Interval(15, 20));
+            new Interval(0, 5), new Interval(6, 10), new Interval(15, 20));
 
-        printExercise("8.1 Meetings " + meetings, canAttendAll(meetings) ? "✓ no conflict" : "✗ conflict!");
-        printExercise("    Meetings " + noConflict, canAttendAll(noConflict) ? "✓ no conflict" : "✗ conflict!");
+        printExercise("8.1 Meetings " + meetings,
+            canAttendAll(meetings) ? "✓ no conflict" : "✗ conflict!");
+        printExercise("    Meetings " + noConflict,
+            canAttendAll(noConflict) ? "✓ no conflict" : "✗ conflict!");
     }
+
+    // ═══════════════════════════════════════════════════════════════════
+    //  SECTION 8 — MEETING ROOMS / SCHEDULING
+    // ═══════════════════════════════════════════════════════════════════
 
     /**
      * Minimum number of meeting rooms required (max concurrent meetings).
@@ -650,8 +609,8 @@ public class ArrayIntervalExercises {
      */
     static void minMeetingRooms() {
         List<Interval> meetings = List.of(
-                new Interval(0, 30), new Interval(5, 10),
-                new Interval(15, 20), new Interval(7, 25));
+            new Interval(0, 30), new Interval(5, 10),
+            new Interval(15, 20), new Interval(7, 25));
 
         TreeMap<Integer, Integer> events = new TreeMap<>();
         meetings.forEach(m -> {
@@ -675,8 +634,8 @@ public class ArrayIntervalExercises {
     static void findFreeSlots() {
         int dayStart = 9, dayEnd = 18;
         List<Interval> schedule = List.of(
-                new Interval(9, 10), new Interval(11, 13),
-                new Interval(14, 15), new Interval(16, 17));
+            new Interval(9, 10), new Interval(11, 13),
+            new Interval(14, 15), new Interval(16, 17));
 
         List<Interval> merged = mergeIntervals(schedule);
         List<Interval> freeSlots = new ArrayList<>();
@@ -696,32 +655,32 @@ public class ArrayIntervalExercises {
         printExercise("    Free slots", freeSlots);
     }
 
-    // ═══════════════════════════════════════════════════════════════════
-    //  SECTION 9 — INTERVAL CONTAINS & QUERIES
-    // ═══════════════════════════════════════════════════════════════════
-
     /**
      * Determines which intervals contain a given query point.
      */
     static void pointInIntervalQuery() {
         List<Interval> intervals = List.of(
-                new Interval(1, 5), new Interval(3, 8),
-                new Interval(7, 12), new Interval(15, 20));
+            new Interval(1, 5), new Interval(3, 8),
+            new Interval(7, 12), new Interval(15, 20));
         int queryPoint = 4;
 
         List<Interval> containing = intervals.stream()
-                .filter(iv -> iv.containsPoint(queryPoint))
-                .toList();
+            .filter(iv -> iv.containsPoint(queryPoint))
+            .toList();
 
         printExercise("9.1 Intervals containing point " + queryPoint, containing);
     }
+
+    // ═══════════════════════════════════════════════════════════════════
+    //  SECTION 9 — INTERVAL CONTAINS & QUERIES
+    // ═══════════════════════════════════════════════════════════════════
 
     /**
      * Checks if one set of intervals fully covers another range.
      */
     static void rangeContainmentCheck() {
         List<Interval> intervals = List.of(
-                new Interval(1, 5), new Interval(4, 8), new Interval(7, 12));
+            new Interval(1, 5), new Interval(4, 8), new Interval(7, 12));
         Interval target = new Interval(2, 10);
 
         List<Interval> merged = mergeIntervals(intervals);
@@ -736,40 +695,41 @@ public class ArrayIntervalExercises {
      */
     static void totalCoveredLength() {
         List<Interval> intervals = List.of(
-                new Interval(1, 4), new Interval(3, 6),
-                new Interval(8, 10), new Interval(9, 12));
+            new Interval(1, 4), new Interval(3, 6),
+            new Interval(8, 10), new Interval(9, 12));
 
         int totalLength = mergeIntervals(intervals).stream()
-                .mapToInt(Interval::length)
-                .sum();
+            .mapToInt(Interval::length)
+            .sum();
 
         printExercise("9.3 Intervals", intervals);
         printExercise("    Total covered length", totalLength);
     }
-
-    // ═══════════════════════════════════════════════════════════════════
-    //  SECTION 10 — REAL-WORLD SCENARIOS
-    // ═══════════════════════════════════════════════════════════════════
 
     /**
      * Merging overlapping time slots for a booking system.
      */
     static void mergeTimeSlots() {
         // Time slots as hours (e.g., 9 = 9am, 13 = 1pm)
-        record TimeSlot(String label, Interval time) {}
+        record TimeSlot(String label, Interval time) {
+        }
 
         List<TimeSlot> bookings = List.of(
-                new TimeSlot("Meeting A", new Interval(9, 11)),
-                new TimeSlot("Meeting B", new Interval(10, 12)),
-                new TimeSlot("Meeting C", new Interval(14, 16)),
-                new TimeSlot("Meeting D", new Interval(15, 17)));
+            new TimeSlot("Meeting A", new Interval(9, 11)),
+            new TimeSlot("Meeting B", new Interval(10, 12)),
+            new TimeSlot("Meeting C", new Interval(14, 16)),
+            new TimeSlot("Meeting D", new Interval(15, 17)));
 
         List<Interval> mergedSlots = mergeIntervals(
-                bookings.stream().map(TimeSlot::time).toList());
+            bookings.stream().map(TimeSlot::time).toList());
 
         printExercise("10.1 Bookings", bookings);
         printExercise("     Merged busy times", mergedSlots);
     }
+
+    // ═══════════════════════════════════════════════════════════════════
+    //  SECTION 10 — REAL-WORLD SCENARIOS
+    // ═══════════════════════════════════════════════════════════════════
 
     /**
      * Finding mutual free time across multiple people's calendars.
@@ -778,15 +738,15 @@ public class ArrayIntervalExercises {
         int dayStart = 9, dayEnd = 18;
 
         Map<String, List<Interval>> calendars = Map.of(
-                "Alice", List.of(new Interval(9, 10), new Interval(12, 14)),
-                "Bob", List.of(new Interval(10, 11), new Interval(13, 15)),
-                "Clara", List.of(new Interval(9, 11), new Interval(14, 16)));
+            "Alice", List.of(new Interval(9, 10), new Interval(12, 14)),
+            "Bob", List.of(new Interval(10, 11), new Interval(13, 15)),
+            "Clara", List.of(new Interval(9, 11), new Interval(14, 16)));
 
         // Union all busy times
         List<Interval> allBusy = mergeIntervals(
-                calendars.values().stream()
-                        .flatMap(Collection::stream)
-                        .toList());
+            calendars.values().stream()
+                .flatMap(Collection::stream)
+                .toList());
 
         // Find gaps = mutual free time
         List<Interval> mutualFree = new ArrayList<>();
@@ -803,7 +763,7 @@ public class ArrayIntervalExercises {
 
         System.out.println("  ► 10.2 Calendar availability (9am–6pm):");
         calendars.forEach((name, slots) ->
-                System.out.println("    %-8s busy: %s".formatted(name, slots)));
+            System.out.println("    %-8s busy: %s".formatted(name, slots)));
         printExercise("    All busy (merged)", allBusy);
         printExercise("    Mutual free time", mutualFree);
     }
@@ -814,9 +774,9 @@ public class ArrayIntervalExercises {
     static void consolidateIpRanges() {
         // Simulated as integer ranges for simplicity
         List<Interval> ranges = List.of(
-                new Interval(100, 200), new Interval(150, 300),
-                new Interval(400, 500), new Interval(450, 600),
-                new Interval(700, 800));
+            new Interval(100, 200), new Interval(150, 300),
+            new Interval(400, 500), new Interval(450, 600),
+            new Interval(700, 800));
 
         List<Interval> consolidated = mergeIntervals(ranges);
 
@@ -828,12 +788,13 @@ public class ArrayIntervalExercises {
      * Finding time overlaps between employee shifts.
      */
     static void employeeShiftOverlaps() {
-        record Shift(String employee, Interval time) {}
+        record Shift(String employee, Interval time) {
+        }
 
         List<Shift> shifts = List.of(
-                new Shift("Alice", new Interval(8, 16)),
-                new Shift("Bob", new Interval(10, 18)),
-                new Shift("Clara", new Interval(12, 20)));
+            new Shift("Alice", new Interval(8, 16)),
+            new Shift("Bob", new Interval(10, 18)),
+            new Shift("Clara", new Interval(12, 20)));
 
         // Find all pairwise overlaps
         System.out.println("  ► 10.4 Employee shift overlaps:");
@@ -841,16 +802,16 @@ public class ArrayIntervalExercises {
             for (int j = i + 1; j < shifts.size(); j++) {
                 Shift s1 = shifts.get(i), s2 = shifts.get(j);
                 s1.time().intersect(s2.time()).ifPresent(overlap ->
-                        System.out.println("    %s ∩ %s = %s (%dh overlap)".formatted(
-                                s1.employee(), s2.employee(), overlap, overlap.length())));
+                    System.out.println("    %s ∩ %s = %s (%dh overlap)".formatted(
+                        s1.employee(), s2.employee(), overlap, overlap.length())));
             }
         }
 
         // Find when ALL employees overlap
         Optional<Interval> allOverlap = shifts.stream()
-                .map(Shift::time)
-                .reduce(Interval::intersect)
-                .flatMap(opt -> opt);
+            .map(Shift::time)
+            .reduce(Interval::intersect)
+            .flatMap(opt -> opt);
 
         // The reduce here doesn't quite work because intersect returns Optional.
         // Let's do it properly:
@@ -861,12 +822,8 @@ public class ArrayIntervalExercises {
         }
 
         printExercise("    All-three overlap",
-                universalOverlap.map(Interval::toString).orElse("none"));
+            universalOverlap.map(Interval::toString).orElse("none"));
     }
-
-    // ═══════════════════════════════════════════════════════════════════
-    //  SHARED UTILITIES
-    // ═══════════════════════════════════════════════════════════════════
 
     /**
      * The core merge-overlapping-intervals algorithm.
@@ -877,7 +834,9 @@ public class ArrayIntervalExercises {
      * @return a new list of non-overlapping, sorted, merged intervals
      */
     static List<Interval> mergeIntervals(List<Interval> intervals) {
-        if (intervals.isEmpty()) return List.of();
+        if (intervals.isEmpty()) {
+            return List.of();
+        }
 
         List<Interval> sorted = intervals.stream().sorted().toList();
         List<Interval> merged = new ArrayList<>();
@@ -895,10 +854,14 @@ public class ArrayIntervalExercises {
         return merged;
     }
 
+    // ═══════════════════════════════════════════════════════════════════
+    //  SHARED UTILITIES
+    // ═══════════════════════════════════════════════════════════════════
+
     static boolean canAttendAll(List<Interval> meetings) {
         List<Interval> sorted = meetings.stream().sorted().toList();
         return IntStream.range(1, sorted.size())
-                .noneMatch(i -> sorted.get(i).start() < sorted.get(i - 1).end());
+            .noneMatch(i -> sorted.get(i).start() < sorted.get(i - 1).end());
     }
 
     private static void printExercise(String label, Object result) {
@@ -909,5 +872,78 @@ public class ArrayIntervalExercises {
         System.out.println("\n╔══════════════════════════════════════════════════════════╗");
         System.out.println("║  SECTION " + title);
         System.out.println("╚══════════════════════════════════════════════════════════╝");
+    }
+
+    /**
+     * Represents a closed interval [start, end].
+     *
+     * <p>Using a record for immutability and built-in toString/equals.
+     * Implements {@link Comparable} for natural ordering by start time.</p>
+     *
+     * @param start the inclusive lower bound
+     * @param end   the inclusive upper bound
+     */
+    record Interval(int start, int end) implements Comparable<Interval> {
+        Interval {
+            if (start > end) {
+                throw new IllegalArgumentException(
+                    "start (%d) > end (%d)".formatted(start, end));
+            }
+        }
+
+        /**
+         * Returns true if this interval overlaps with other.
+         */
+        boolean overlaps(Interval other) {
+            return this.start <= other.end && other.start <= this.end;
+        }
+
+        /**
+         * Returns true if this interval fully contains other.
+         */
+        boolean contains(Interval other) {
+            return this.start <= other.start && this.end >= other.end;
+        }
+
+        /**
+         * Returns true if this interval contains the given point.
+         */
+        boolean containsPoint(int point) {
+            return start <= point && point <= end;
+        }
+
+        /**
+         * Merges this interval with an overlapping interval.
+         */
+        Interval merge(Interval other) {
+            return new Interval(Math.min(start, other.start), Math.max(end, other.end));
+        }
+
+        /**
+         * Returns the intersection with another interval, or empty if none.
+         */
+        Optional<Interval> intersect(Interval other) {
+            int lo = Math.max(start, other.start);
+            int hi = Math.min(end, other.end);
+            return lo <= hi ? Optional.of(new Interval(lo, hi)) : Optional.empty();
+        }
+
+        /**
+         * Returns the length/size of this interval.
+         */
+        int length() {
+            return end - start;
+        }
+
+        @Override
+        public int compareTo(Interval o) {
+            return start != o.start ? Integer.compare(start, o.start)
+                : Integer.compare(end, o.end);
+        }
+
+        @Override
+        public String toString() {
+            return "[%d, %d]".formatted(start, end);
+        }
     }
 }

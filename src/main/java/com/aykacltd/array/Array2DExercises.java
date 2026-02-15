@@ -205,9 +205,9 @@ public class Array2DExercises {
 
     // All ones
     int[][] ones = new int[n][n];
-      for (int[] row : ones) {
-          Arrays.fill(row, 1);
-      }
+    for (int[] row : ones) {
+      Arrays.fill(row, 1);
+    }
 
     // Diagonal matrix
     int[] diagValues = {5, 10, 15, 20};
@@ -233,11 +233,11 @@ public class Array2DExercises {
   static void rowMajorTraversal() {
     int[][] m = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
     List<Integer> order = new ArrayList<>();
-      for (int[] row : m) {
-          for (int val : row) {
-              order.add(val);
-          }
+    for (int[] row : m) {
+      for (int val : row) {
+        order.add(val);
       }
+    }
 
     printExercise("2.1 Row-major", order);
   }
@@ -252,11 +252,11 @@ public class Array2DExercises {
   static void columnMajorTraversal() {
     int[][] m = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
     List<Integer> order = new ArrayList<>();
-      for (int c = 0; c < m[0].length; c++) {
-          for (int[] row : m) {
-              order.add(row[c]);
-          }
+    for (int c = 0; c < m[0].length; c++) {
+      for (int[] row : m) {
+        order.add(row[c]);
       }
+    }
 
     printExercise("2.2 Column-major", order);
   }
@@ -275,21 +275,21 @@ public class Array2DExercises {
     List<Integer> boundary = new ArrayList<>();
 
     // Top row left→right
-      for (int c = 0; c < cols; c++) {
-          boundary.add(m[0][c]);
-      }
+    for (int c = 0; c < cols; c++) {
+      boundary.add(m[0][c]);
+    }
     // Right column top→bottom (skip first)
-      for (int r = 1; r < rows; r++) {
-          boundary.add(m[r][cols - 1]);
-      }
+    for (int r = 1; r < rows; r++) {
+      boundary.add(m[r][cols - 1]);
+    }
     // Bottom row right→left (skip last)
-      for (int c = cols - 2; c >= 0; c--) {
-          boundary.add(m[rows - 1][c]);
-      }
+    for (int c = cols - 2; c >= 0; c--) {
+      boundary.add(m[rows - 1][c]);
+    }
     // Left column bottom→top (skip first and last)
-      for (int r = rows - 2; r >= 1; r--) {
-          boundary.add(m[r][0]);
-      }
+    for (int r = rows - 2; r >= 1; r--) {
+      boundary.add(m[r][0]);
+    }
 
     printExercise("2.3 Boundary traversal", boundary);
   }
@@ -303,13 +303,13 @@ public class Array2DExercises {
 
     for (int r = 0; r < m.length; r++) {
       if (r % 2 == 0) {
-          for (int c = 0; c < m[r].length; c++) {
-              zigzag.add(m[r][c]);
-          }
+        for (int c = 0; c < m[r].length; c++) {
+          zigzag.add(m[r][c]);
+        }
       } else {
-          for (int c = m[r].length - 1; c >= 0; c--) {
-              zigzag.add(m[r][c]);
-          }
+        for (int c = m[r].length - 1; c >= 0; c--) {
+          zigzag.add(m[r][c]);
+        }
       }
     }
 
@@ -446,11 +446,11 @@ public class Array2DExercises {
     int rows = m.length, cols = m[0].length;
 
     int[][] transposed = new int[cols][rows];  // 4×2
-      for (int r = 0; r < rows; r++) {
-          for (int c = 0; c < cols; c++) {
-              transposed[c][r] = m[r][c];
-          }
+    for (int r = 0; r < rows; r++) {
+      for (int c = 0; c < cols; c++) {
+        transposed[c][r] = m[r][c];
       }
+    }
 
     printMatrix("4.2 Original (2×4)", m);
     printMatrix("    Transposed (4×2)", transposed);
@@ -492,11 +492,11 @@ public class Array2DExercises {
     int n = m.length;
 
     int[][] rotated = new int[n][n];
-      for (int r = 0; r < n; r++) {
-          for (int c = 0; c < n; c++) {
-              rotated[c][n - 1 - r] = m[r][c];
-          }
+    for (int r = 0; r < n; r++) {
+      for (int c = 0; c < n; c++) {
+        rotated[c][n - 1 - r] = m[r][c];
       }
+    }
 
     printMatrix("5.1 Rotate 90° CW", rotated);
   }
@@ -512,11 +512,11 @@ public class Array2DExercises {
     int n = m.length;
 
     int[][] rotated = new int[n][n];
-      for (int r = 0; r < n; r++) {
-          for (int c = 0; c < n; c++) {
-              rotated[n - 1 - c][r] = m[r][c];
-          }
+    for (int r = 0; r < n; r++) {
+      for (int c = 0; c < n; c++) {
+        rotated[n - 1 - c][r] = m[r][c];
       }
+    }
 
     printMatrix("5.2 Rotate 90° CCW", rotated);
   }
@@ -532,11 +532,11 @@ public class Array2DExercises {
     int n = m.length;
 
     int[][] rotated = new int[n][n];
-      for (int r = 0; r < n; r++) {
-          for (int c = 0; c < n; c++) {
-              rotated[n - 1 - r][n - 1 - c] = m[r][c];
-          }
+    for (int r = 0; r < n; r++) {
+      for (int c = 0; c < n; c++) {
+        rotated[n - 1 - r][n - 1 - c] = m[r][c];
       }
+    }
 
     printMatrix("5.3 Rotate 180°", rotated);
   }
@@ -552,22 +552,22 @@ public class Array2DExercises {
     int n = m.length;
 
     // Step 1: transpose
-      for (int i = 0; i < n; i++) {
-          for (int j = i + 1; j < n; j++) {
-              int temp = m[i][j];
-              m[i][j] = m[j][i];
-              m[j][i] = temp;
-          }
+    for (int i = 0; i < n; i++) {
+      for (int j = i + 1; j < n; j++) {
+        int temp = m[i][j];
+        m[i][j] = m[j][i];
+        m[j][i] = temp;
       }
+    }
 
     // Step 2: reverse each row
-      for (int[] row : m) {
-          for (int i = 0, j = n - 1; i < j; i++, j--) {
-              int temp = row[i];
-              row[i] = row[j];
-              row[j] = temp;
-          }
+    for (int[] row : m) {
+      for (int i = 0, j = n - 1; i < j; i++, j--) {
+        int temp = row[i];
+        row[i] = row[j];
+        row[j] = temp;
       }
+    }
 
     printMatrix("5.4 Rotate 90° CW (in-place)", m);
   }
@@ -603,27 +603,27 @@ public class Array2DExercises {
 
     while (top <= bottom && left <= right) {
       // →  traverse top row
-        for (int c = left; c <= right; c++) {
-            spiral.add(m[top][c]);
-        }
+      for (int c = left; c <= right; c++) {
+        spiral.add(m[top][c]);
+      }
       top++;
       // ↓  traverse right column
-        for (int r = top; r <= bottom; r++) {
-            spiral.add(m[r][right]);
-        }
+      for (int r = top; r <= bottom; r++) {
+        spiral.add(m[r][right]);
+      }
       right--;
       // ←  traverse bottom row
       if (top <= bottom) {
-          for (int c = right; c >= left; c--) {
-              spiral.add(m[bottom][c]);
-          }
+        for (int c = right; c >= left; c--) {
+          spiral.add(m[bottom][c]);
+        }
         bottom--;
       }
       // ↑  traverse left column
       if (left <= right) {
-          for (int r = bottom; r >= top; r--) {
-              spiral.add(m[r][left]);
-          }
+        for (int r = bottom; r >= top; r--) {
+          spiral.add(m[r][left]);
+        }
         left++;
       }
     }
@@ -855,9 +855,9 @@ public class Array2DExercises {
         result = "found at [%d,%d] in %d steps".formatted(r, c, steps);
         break;
       } else if (m[r][c] > target) {
-          c--;
+        c--;
       } else {
-          r++;
+        r++;
       }
     }
 
@@ -886,9 +886,9 @@ public class Array2DExercises {
         }
       }
     }
-      if (!found) {
-          System.out.println("    None found");
-      }
+    if (!found) {
+      System.out.println("    None found");
+    }
   }
 
   // ═══════════════════════════════════════════════════════════════════
@@ -941,9 +941,9 @@ public class Array2DExercises {
     int[][] mirrored = Arrays.stream(m)
         .map(row -> {
           int[] rev = new int[row.length];
-            for (int i = 0; i < row.length; i++) {
-                rev[i] = row[row.length - 1 - i];
-            }
+          for (int i = 0; i < row.length; i++) {
+            rev[i] = row[row.length - 1 - i];
+          }
           return rev;
         })
         .toArray(int[][]::new);
@@ -995,9 +995,9 @@ public class Array2DExercises {
 
     printExercise("10.1 Jagged array", Arrays.deepToString(jagged));
     System.out.println("  ► 10.1 Pascal's triangle:");
-      for (int[] row : pascal) {
-          System.out.println("    " + Arrays.toString(row));
-      }
+    for (int[] row : pascal) {
+      System.out.println("    " + Arrays.toString(row));
+    }
   }
 
   /**
@@ -1037,13 +1037,13 @@ public class Array2DExercises {
 
     int[][][] cube = new int[layers][rows][cols];
     int counter = 1;
-      for (int l = 0; l < layers; l++) {
-          for (int r = 0; r < rows; r++) {
-              for (int c = 0; c < cols; c++) {
-                  cube[l][r][c] = counter++;
-              }
-          }
+    for (int l = 0; l < layers; l++) {
+      for (int r = 0; r < rows; r++) {
+        for (int c = 0; c < cols; c++) {
+          cube[l][r][c] = counter++;
+        }
       }
+    }
 
     System.out.println("  ► 11.1 3D array (2 layers × 3 rows × 4 cols):");
     for (int l = 0; l < layers; l++) {
@@ -1289,19 +1289,19 @@ public class Array2DExercises {
     dp[0][0] = grid[0][0];
 
     // Fill first row
-      for (int c = 1; c < cols; c++) {
-          dp[0][c] = dp[0][c - 1] + grid[0][c];
-      }
+    for (int c = 1; c < cols; c++) {
+      dp[0][c] = dp[0][c - 1] + grid[0][c];
+    }
     // Fill first column
-      for (int r = 1; r < rows; r++) {
-          dp[r][0] = dp[r - 1][0] + grid[r][0];
-      }
+    for (int r = 1; r < rows; r++) {
+      dp[r][0] = dp[r - 1][0] + grid[r][0];
+    }
     // Fill rest
-      for (int r = 1; r < rows; r++) {
-          for (int c = 1; c < cols; c++) {
-              dp[r][c] = grid[r][c] + Math.min(dp[r - 1][c], dp[r][c - 1]);
-          }
+    for (int r = 1; r < rows; r++) {
+      for (int c = 1; c < cols; c++) {
+        dp[r][c] = grid[r][c] + Math.min(dp[r - 1][c], dp[r][c - 1]);
       }
+    }
 
     printMatrix("13.3 Grid costs", grid);
     printMatrix("    DP table (min path sums)", dp);
@@ -1352,17 +1352,17 @@ public class Array2DExercises {
 
   private static int countNeighbours(int[][] board, int row, int col) {
     int count = 0;
-      for (int dr = -1; dr <= 1; dr++) {
-          for (int dc = -1; dc <= 1; dc++) {
-              if (dr == 0 && dc == 0) {
-                  continue;
-              }
-              int r = row + dr, c = col + dc;
-              if (r >= 0 && r < board.length && c >= 0 && c < board[0].length) {
-                  count += board[r][c];
-              }
-          }
+    for (int dr = -1; dr <= 1; dr++) {
+      for (int dc = -1; dc <= 1; dc++) {
+        if (dr == 0 && dc == 0) {
+          continue;
+        }
+        int r = row + dr, c = col + dc;
+        if (r >= 0 && r < board.length && c >= 0 && c < board[0].length) {
+          count += board[r][c];
+        }
       }
+    }
     return count;
   }
 
@@ -1374,9 +1374,9 @@ public class Array2DExercises {
 
   private static int[][] identityMatrix(int n) {
     int[][] id = new int[n][n];
-      for (int i = 0; i < n; i++) {
-          id[i][i] = 1;
-      }
+    for (int i = 0; i < n; i++) {
+      id[i][i] = 1;
+    }
     return id;
   }
 
@@ -1387,13 +1387,13 @@ public class Array2DExercises {
   private static int[][] multiplyMatrices(int[][] a, int[][] b) {
     int rows = a.length, cols = b[0].length, inner = b.length;
     int[][] result = new int[rows][cols];
-      for (int r = 0; r < rows; r++) {
-          for (int c = 0; c < cols; c++) {
-              for (int k = 0; k < inner; k++) {
-                  result[r][c] += a[r][k] * b[k][c];
-              }
-          }
+    for (int r = 0; r < rows; r++) {
+      for (int c = 0; c < cols; c++) {
+        for (int k = 0; k < inner; k++) {
+          result[r][c] += a[r][k] * b[k][c];
+        }
       }
+    }
     return result;
   }
 
@@ -1405,9 +1405,9 @@ public class Array2DExercises {
   }
 
   private static void printMatrixIndented(int[][] m, String indent) {
-      for (int[] row : m) {
-          System.out.println(indent + Arrays.toString(row));
-      }
+    for (int[] row : m) {
+      System.out.println(indent + Arrays.toString(row));
+    }
   }
 
   private static void printExercise(String label, Object result) {

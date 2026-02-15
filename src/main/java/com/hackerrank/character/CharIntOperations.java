@@ -51,7 +51,7 @@ public class CharIntOperations {
       if (!Character.isLetter(aChar)) {
         continue;
       }
-      int value =  aChar;
+      int value = aChar;
 
       // Bounds check - only mark if within array bounds
       if (value < marked.length) {

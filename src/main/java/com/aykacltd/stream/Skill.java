@@ -7,14 +7,14 @@ package com.aykacltd.stream;
  * and a category for classification. Used in Stream exercises for
  * flatMapping, nested collection processing, and multi-level grouping.</p>
  *
- * @param name        the name of the skill (e.g. "Java", "Project Management")
- * @param level       the proficiency level
- * @param category    broad category (e.g. "Programming", "Leadership")
+ * @param name     the name of the skill (e.g. "Java", "Project Management")
+ * @param level    the proficiency level
+ * @param category broad category (e.g. "Programming", "Leadership")
  */
 public record Skill(
-        String name,
-        ProficiencyLevel level,
-        String category
+    String name,
+    ProficiencyLevel level,
+    String category
 ) {
 
     /**

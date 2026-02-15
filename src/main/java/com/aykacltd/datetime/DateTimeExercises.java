@@ -1,13 +1,45 @@
 package com.aykacltd.datetime;
 
 import data.SampleData;
+import java.time.DayOfWeek;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Month;
+import java.time.MonthDay;
+import java.time.OffsetDateTime;
+import java.time.Period;
+import java.time.Year;
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+import java.time.format.FormatStyle;
+import java.time.format.ResolverStyle;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjuster;
+import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.TemporalQueries;
+import java.time.temporal.TemporalQuery;
+import java.time.temporal.TemporalUnit;
+import java.time.temporal.UnsupportedTemporalTypeException;
+import java.util.Calendar;
+import java.util.Comparator;
+import java.util.GregorianCalendar;
+import java.util.IntSummaryStatistics;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.OptionalDouble;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 import model.*;
-
-import java.time.*;
-import java.time.format.*;
-import java.time.temporal.*;
-import java.util.*;
-import java.util.stream.*;
 
 /**
  * <h1>Java Date &amp; Time API — Comprehensive Exercise Suite</h1>
@@ -273,8 +305,8 @@ public class DateTimeExercises {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime specific = LocalDateTime.of(2025, 6, 15, 14, 30);
         LocalDateTime fromParts = LocalDateTime.of(
-                LocalDate.of(2025, 6, 15),
-                LocalTime.of(14, 30));
+            LocalDate.of(2025, 6, 15),
+            LocalTime.of(14, 30));
         LocalDateTime parsed = LocalDateTime.parse("2025-06-15T14:30:00");
 
         printExercise("1.3 LocalDateTime.now()", now);
@@ -295,10 +327,10 @@ public class DateTimeExercises {
         ZonedDateTime nowUtc = ZonedDateTime.now(ZoneId.of("UTC"));
         ZonedDateTime nowLondon = ZonedDateTime.now(ZoneId.of("Europe/London"));
         ZonedDateTime specific = ZonedDateTime.of(
-                2025, 6, 15, 14, 30, 0, 0,
-                ZoneId.of("Europe/London"));
+            2025, 6, 15, 14, 30, 0, 0,
+            ZoneId.of("Europe/London"));
         ZonedDateTime fromLdt = LocalDateTime.of(2025, 6, 15, 14, 30)
-                .atZone(ZoneId.of("Asia/Tokyo"));
+            .atZone(ZoneId.of("Asia/Tokyo"));
 
         printExercise("1.4 ZonedDateTime.now(UTC)", nowUtc);
         printExercise("    now(Europe/London)", nowLondon);
@@ -319,8 +351,8 @@ public class DateTimeExercises {
         OffsetDateTime now = OffsetDateTime.now();
         OffsetDateTime utc = OffsetDateTime.now(ZoneOffset.UTC);
         OffsetDateTime specific = OffsetDateTime.of(
-                2025, 6, 15, 14, 30, 0, 0,
-                ZoneOffset.ofHours(5));
+            2025, 6, 15, 14, 30, 0, 0,
+            ZoneOffset.ofHours(5));
         OffsetDateTime parsed = OffsetDateTime.parse("2025-06-15T14:30:00+01:00");
 
         printExercise("1.5 OffsetDateTime.now()", now);
@@ -438,7 +470,8 @@ public class DateTimeExercises {
 
         // Date-time with timezone
         DateTimeFormatter withZone = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss VV");
-        ZonedDateTime zonedParsed = ZonedDateTime.parse("2025-06-15 14:30:00 Europe/London", withZone);
+        ZonedDateTime zonedParsed =
+            ZonedDateTime.parse("2025-06-15 14:30:00 Europe/London", withZone);
 
         printExercise("2.2 UK format dd/MM/yyyy", ukDate);
         printExercise("    US format MM-dd-yyyy", usDate);
@@ -460,17 +493,17 @@ public class DateTimeExercises {
      */
     static void parseLenientAndStrict() {
         DateTimeFormatter strict = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                .withResolverStyle(ResolverStyle.STRICT);
+            .withResolverStyle(ResolverStyle.STRICT);
         DateTimeFormatter smart = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                .withResolverStyle(ResolverStyle.SMART);
+            .withResolverStyle(ResolverStyle.SMART);
         DateTimeFormatter lenient = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                .withResolverStyle(ResolverStyle.LENIENT);
+            .withResolverStyle(ResolverStyle.LENIENT);
 
         // Strict rejects invalid dates
         try {
             // Note: STRICT mode requires 'uuuu' (proleptic year) not 'yyyy' (era year)
             DateTimeFormatter strictProleptic = DateTimeFormatter.ofPattern("uuuu-MM-dd")
-                    .withResolverStyle(ResolverStyle.STRICT);
+                .withResolverStyle(ResolverStyle.STRICT);
             LocalDate.parse("2025-02-29", strictProleptic);
             printExercise("2.3 STRICT Feb 29 2025", "accepted (unexpected)");
         } catch (DateTimeParseException e) {
@@ -495,20 +528,20 @@ public class DateTimeExercises {
      */
     static void parseWithOptionalParts() {
         DateTimeFormatter flexible = DateTimeFormatter.ofPattern(
-                "yyyy-MM-dd['T'HH:mm:ss[.SSS]][' 'HH:mm]");
+            "yyyy-MM-dd['T'HH:mm:ss[.SSS]][' 'HH:mm]");
 
         LocalDateTime withTime = LocalDateTime.parse("2025-06-15T14:30:00", flexible);
         LocalDateTime withMillis = LocalDateTime.parse("2025-06-15T14:30:00.123", flexible);
         // Date-only parses to midnight via default
         DateTimeFormatter dateOptionalTime = new DateTimeFormatterBuilder()
-                .appendPattern("yyyy-MM-dd")
-                .optionalStart()
-                .appendPattern("'T'HH:mm:ss")
-                .optionalEnd()
-                .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
-                .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
-                .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
-                .toFormatter();
+            .appendPattern("yyyy-MM-dd")
+            .optionalStart()
+            .appendPattern("'T'HH:mm:ss")
+            .optionalEnd()
+            .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+            .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+            .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
+            .toFormatter();
 
         LocalDateTime dateOnly = LocalDateTime.parse("2025-06-15", dateOptionalTime);
         LocalDateTime full = LocalDateTime.parse("2025-06-15T14:30:00", dateOptionalTime);
@@ -530,9 +563,9 @@ public class DateTimeExercises {
     static void parseEdgeCases() {
         // Case-insensitive parsing (e.g. "jun" instead of "Jun")
         DateTimeFormatter caseInsensitive = new DateTimeFormatterBuilder()
-                .parseCaseInsensitive()
-                .appendPattern("dd-MMM-yyyy")
-                .toFormatter(Locale.UK);
+            .parseCaseInsensitive()
+            .appendPattern("dd-MMM-yyyy")
+            .toFormatter(Locale.UK);
         LocalDate caseDate = LocalDate.parse("15-jun-2025", caseInsensitive);
 
         // Padded vs unpadded: single-digit day/month
@@ -562,7 +595,8 @@ public class DateTimeExercises {
         printExercise("3.1 ISO_LOCAL_DATE", date.format(DateTimeFormatter.ISO_LOCAL_DATE));
         printExercise("    ISO_LOCAL_DATE_TIME", ldt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         printExercise("    ISO_ZONED_DATE_TIME", zdt.format(DateTimeFormatter.ISO_ZONED_DATE_TIME));
-        printExercise("    ISO_OFFSET_DATE_TIME", zdt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        printExercise("    ISO_OFFSET_DATE_TIME",
+            zdt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
         printExercise("    ISO_INSTANT", zdt.format(DateTimeFormatter.ISO_INSTANT));
         printExercise("    ISO_ORDINAL_DATE", date.format(DateTimeFormatter.ISO_ORDINAL_DATE));
         printExercise("    BASIC_ISO_DATE", date.format(DateTimeFormatter.BASIC_ISO_DATE));
@@ -584,19 +618,19 @@ public class DateTimeExercises {
         LocalDateTime ldt = LocalDateTime.of(2025, 6, 15, 14, 30, 45);
 
         printExercise("3.2 dd/MM/yyyy",
-                ldt.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+            ldt.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         printExercise("    MM-dd-yyyy HH:mm",
-                ldt.format(DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm")));
+            ldt.format(DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm")));
         printExercise("    d MMM yyyy",
-                ldt.format(DateTimeFormatter.ofPattern("d MMM yyyy")));
+            ldt.format(DateTimeFormatter.ofPattern("d MMM yyyy")));
         printExercise("    EEEE, d MMMM yyyy",
-                ldt.format(DateTimeFormatter.ofPattern("EEEE, d MMMM yyyy", Locale.UK)));
+            ldt.format(DateTimeFormatter.ofPattern("EEEE, d MMMM yyyy", Locale.UK)));
         printExercise("    hh:mm a (12-hour)",
-                ldt.format(DateTimeFormatter.ofPattern("hh:mm a")));
+            ldt.format(DateTimeFormatter.ofPattern("hh:mm a")));
         printExercise("    HH:mm:ss (24-hour)",
-                ldt.format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+            ldt.format(DateTimeFormatter.ofPattern("HH:mm:ss")));
         printExercise("    yyyy-MM-dd'T'HH:mm:ss",
-                ldt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")));
+            ldt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")));
     }
 
     /**
@@ -610,23 +644,23 @@ public class DateTimeExercises {
         LocalDateTime ldt = LocalDateTime.of(2025, 6, 15, 14, 30, 45);
 
         printExercise("3.3 UK FULL",
-                ldt.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL)
-                        .withLocale(Locale.UK)));
+            ldt.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL)
+                .withLocale(Locale.UK)));
         printExercise("    UK MEDIUM",
-                ldt.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
-                        .withLocale(Locale.UK)));
+            ldt.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
+                .withLocale(Locale.UK)));
         printExercise("    US MEDIUM",
-                ldt.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
-                        .withLocale(Locale.US)));
+            ldt.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
+                .withLocale(Locale.US)));
         printExercise("    France LONG",
-                ldt.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG)
-                        .withLocale(Locale.FRANCE)));
+            ldt.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG)
+                .withLocale(Locale.FRANCE)));
         printExercise("    Germany SHORT",
-                ldt.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
-                        .withLocale(Locale.GERMANY)));
+            ldt.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
+                .withLocale(Locale.GERMANY)));
         printExercise("    Japan MEDIUM",
-                ldt.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
-                        .withLocale(Locale.JAPAN)));
+            ldt.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
+                .withLocale(Locale.JAPAN)));
     }
 
     /**
@@ -687,8 +721,8 @@ public class DateTimeExercises {
         printExercise("    LDT.atZone(Tokyo)", tokyo);
         printExercise("    LDT.atZone(NewYork)", newYork);
         printExercise("    ⚠ Same local time, DIFFERENT instants!",
-                "London=%s, Tokyo=%s".formatted(
-                        london.toInstant(), tokyo.toInstant()));
+            "London=%s, Tokyo=%s".formatted(
+                london.toInstant(), tokyo.toInstant()));
     }
 
     /**
@@ -701,7 +735,7 @@ public class DateTimeExercises {
      */
     static void zonedDateTimeToInstant() {
         ZonedDateTime zdt = ZonedDateTime.of(2025, 6, 15, 14, 30, 0, 0,
-                ZoneId.of("Europe/London"));
+            ZoneId.of("Europe/London"));
         Instant instant = zdt.toInstant();
 
         printExercise("4.3 ZonedDateTime → Instant", instant);
@@ -751,7 +785,7 @@ public class DateTimeExercises {
      */
     static void offsetDateTimeToZonedDateTime() {
         OffsetDateTime odt = OffsetDateTime.of(2025, 6, 15, 14, 30, 0, 0,
-                ZoneOffset.ofHours(1));
+            ZoneOffset.ofHours(1));
         ZonedDateTime zdtFixed = odt.toZonedDateTime();
         ZonedDateTime zdtNamed = odt.atZoneSameInstant(ZoneId.of("Europe/London"));
 
@@ -863,8 +897,8 @@ public class DateTimeExercises {
         printExercise("    Reconstructed", reconstructed);
         printExercise("    Equal?", original.equals(reconstructed));
         printExercise("    ⚠ Millis loses nano precision",
-                "original nano=%d, millis-based nano=%d"
-                        .formatted(nano, Instant.ofEpochMilli(original.toEpochMilli()).getNano()));
+            "original nano=%d, millis-based nano=%d"
+                .formatted(nano, Instant.ofEpochMilli(original.toEpochMilli()).getNano()));
     }
 
     /**
@@ -887,7 +921,7 @@ public class DateTimeExercises {
         printExercise("5.4 API timestamp → user time", userTime);
         printExercise("    DB timestamp (millis)", dbTimestamp);
         printExercise("    Time between events", "%d seconds (%.1f hours)".formatted(
-                diffSeconds, diffSeconds / 3600.0));
+            diffSeconds, diffSeconds / 3600.0));
     }
 
     /**
@@ -903,7 +937,7 @@ public class DateTimeExercises {
         printExercise("5.5 Nanosecond precision", precise);
         printExercise("    getNano()", precise.getNano());
         printExercise("    Clock precision demo",
-                "Two Instant.now() calls: %s, %s".formatted(Instant.now(), Instant.now()));
+            "Two Instant.now() calls: %s, %s".formatted(Instant.now(), Instant.now()));
     }
 
     // ═══════════════════════════════════════════════════════════════════
@@ -993,7 +1027,7 @@ public class DateTimeExercises {
         printExercise("    Total minutes", d.toMinutes());
         printExercise("    Total seconds", d.toSeconds());
         printExercise("    Parts: %dh %dm %ds".formatted(
-                d.toHoursPart(), d.toMinutesPart(), d.toSecondsPart()), "");
+            d.toHoursPart(), d.toMinutesPart(), d.toSecondsPart()), "");
         printExercise("    toDays()", d.toDays());
         printExercise("    toDaysPart()", d.toDaysPart());
     }
@@ -1005,7 +1039,8 @@ public class DateTimeExercises {
         Duration d1 = Duration.ofHours(2);
         Duration d2 = Duration.ofMinutes(90);
 
-        printExercise("6.5 2h vs 90m: compareTo", d1.compareTo(d2) > 0 ? "2h is longer" : "90m is longer");
+        printExercise("6.5 2h vs 90m: compareTo",
+            d1.compareTo(d2) > 0 ? "2h is longer" : "90m is longer");
         printExercise("    isZero?", Duration.ZERO.isZero());
         printExercise("    isNegative?", d1.negated().isNegative());
     }
@@ -1066,8 +1101,8 @@ public class DateTimeExercises {
         Period age = Period.between(birth, today);
 
         printExercise("7.3 Period since 1990-03-15",
-                "%d years, %d months, %d days".formatted(
-                        age.getYears(), age.getMonths(), age.getDays()));
+            "%d years, %d months, %d days".formatted(
+                age.getYears(), age.getMonths(), age.getDays()));
         printExercise("    Total months", age.toTotalMonths());
     }
 
@@ -1220,9 +1255,9 @@ public class DateTimeExercises {
      */
     static void compareZonedDateTimesAcrossZones() {
         ZonedDateTime london3pm = ZonedDateTime.of(2025, 6, 15, 15, 0, 0, 0,
-                ZoneId.of("Europe/London"));
+            ZoneId.of("Europe/London"));
         ZonedDateTime tokyo3pm = ZonedDateTime.of(2025, 6, 15, 15, 0, 0, 0,
-                ZoneId.of("Asia/Tokyo"));
+            ZoneId.of("Asia/Tokyo"));
 
         printExercise("9.2 London 3pm vs Tokyo 3pm:");
         printExercise("    London instant", london3pm.toInstant());
@@ -1236,18 +1271,18 @@ public class DateTimeExercises {
      */
     static void sortingDates() {
         List<LocalDate> dates = List.of(
-                LocalDate.of(2025, 12, 25),
-                LocalDate.of(2025, 1, 1),
-                LocalDate.of(2025, 6, 15),
-                LocalDate.of(2025, 3, 8));
+            LocalDate.of(2025, 12, 25),
+            LocalDate.of(2025, 1, 1),
+            LocalDate.of(2025, 6, 15),
+            LocalDate.of(2025, 3, 8));
 
         List<LocalDate> sorted = dates.stream()
-                .sorted()
-                .toList();
+            .sorted()
+            .toList();
 
         List<LocalDate> reversed = dates.stream()
-                .sorted(Comparator.reverseOrder())
-                .toList();
+            .sorted(Comparator.reverseOrder())
+            .toList();
 
         printExercise("9.3 Sorted asc", sorted);
         printExercise("    Sorted desc", reversed);
@@ -1258,8 +1293,8 @@ public class DateTimeExercises {
      */
     static void minMaxDate() {
         List<LocalDate> dates = PEOPLE.stream()
-                .map(Person::getDateOfBirth)
-                .toList();
+            .map(Person::getDateOfBirth)
+            .toList();
 
         LocalDate earliest = dates.stream().min(Comparator.naturalOrder()).orElseThrow();
         LocalDate latest = dates.stream().max(Comparator.naturalOrder()).orElseThrow();
@@ -1284,9 +1319,9 @@ public class DateTimeExercises {
         long totalZones = ZoneId.getAvailableZoneIds().size();
 
         List<String> europeanZones = ZoneId.getAvailableZoneIds().stream()
-                .filter(z -> z.startsWith("Europe/"))
-                .sorted()
-                .toList();
+            .filter(z -> z.startsWith("Europe/"))
+            .sorted()
+            .toList();
 
         printExercise("10.1 Total available zones", totalZones);
         printExercise("     European zones (sample)", europeanZones.stream().limit(10).toList());
@@ -1301,7 +1336,7 @@ public class DateTimeExercises {
      */
     static void convertBetweenZones() {
         ZonedDateTime london = ZonedDateTime.of(2025, 6, 15, 14, 0, 0, 0,
-                ZoneId.of("Europe/London"));
+            ZoneId.of("Europe/London"));
 
         ZonedDateTime newYork = london.withZoneSameInstant(ZoneId.of("America/New_York"));
         ZonedDateTime tokyo = london.withZoneSameInstant(ZoneId.of("Asia/Tokyo"));
@@ -1329,16 +1364,16 @@ public class DateTimeExercises {
      */
     static void withZoneSameInstantVsSameLocal() {
         ZonedDateTime london2pm = ZonedDateTime.of(2025, 6, 15, 14, 0, 0, 0,
-                ZoneId.of("Europe/London"));
+            ZoneId.of("Europe/London"));
 
         ZonedDateTime sameInstant = london2pm.withZoneSameInstant(ZoneId.of("Asia/Tokyo"));
         ZonedDateTime sameLocal = london2pm.withZoneSameLocal(ZoneId.of("Asia/Tokyo"));
 
         printExercise("10.3 London 2pm BST:");
         printExercise("    withZoneSameInstant(Tokyo)",
-                sameInstant + " (same moment, different clock)");
+            sameInstant + " (same moment, different clock)");
         printExercise("    withZoneSameLocal(Tokyo)",
-                sameLocal + " (same clock, DIFFERENT moment!)");
+            sameLocal + " (same clock, DIFFERENT moment!)");
         printExercise("    ⚠ sameLocal shifted by 8 hours!", "");
     }
 
@@ -1367,18 +1402,18 @@ public class DateTimeExercises {
      */
     static void currentTimeMultipleZones() {
         List<String> zones = List.of(
-                "UTC", "Europe/London", "Europe/Paris", "America/New_York",
-                "America/Los_Angeles", "Asia/Tokyo", "Asia/Kolkata",
-                "Australia/Sydney");
+            "UTC", "Europe/London", "Europe/Paris", "America/New_York",
+            "America/Los_Angeles", "Asia/Tokyo", "Asia/Kolkata",
+            "Australia/Sydney");
 
         Instant now = Instant.now();
         System.out.println("  ► 10.5 Current time worldwide (at %s UTC):".formatted(
-                now.atZone(ZoneId.of("UTC")).toLocalTime()));
+            now.atZone(ZoneId.of("UTC")).toLocalTime()));
         zones.forEach(z -> {
             ZonedDateTime zdt = now.atZone(ZoneId.of(z));
             System.out.println("    %-25s %s  (UTC%s)".formatted(
-                    z, zdt.toLocalTime(),
-                    zdt.getOffset()));
+                z, zdt.toLocalTime(),
+                zdt.getOffset()));
         });
     }
 
@@ -1394,29 +1429,29 @@ public class DateTimeExercises {
      */
     static void cityTimeComparison() {
         Map<String, String> cityToZone = Map.of(
-                "London", "Europe/London",
-                "Manchester", "Europe/London",
-                "Birmingham", "Europe/London",
-                "Paris", "Europe/Paris",
-                "Berlin", "Europe/Berlin",
-                "Milan", "Europe/Rome",
-                "Dublin", "Europe/Dublin");
+            "London", "Europe/London",
+            "Manchester", "Europe/London",
+            "Birmingham", "Europe/London",
+            "Paris", "Europe/Paris",
+            "Berlin", "Europe/Berlin",
+            "Milan", "Europe/Rome",
+            "Dublin", "Europe/Dublin");
 
         Instant now = Instant.now();
         System.out.println("  ► 11.1 Person cities — current times:");
         PEOPLE.stream()
-                .map(Person::getHomeCity)
-                .distinct()
-                .filter(cityToZone::containsKey)
-                .forEach(city -> {
-                    ZoneId zone = ZoneId.of(cityToZone.get(city));
-                    ZonedDateTime localTime = now.atZone(zone);
-                    System.out.println("    %-15s %s (%s, UTC%s)".formatted(
-                            city,
-                            localTime.format(DateTimeFormatter.ofPattern("HH:mm")),
-                            zone,
-                            localTime.getOffset()));
-                });
+            .map(Person::getHomeCity)
+            .distinct()
+            .filter(cityToZone::containsKey)
+            .forEach(city -> {
+                ZoneId zone = ZoneId.of(cityToZone.get(city));
+                ZonedDateTime localTime = now.atZone(zone);
+                System.out.println("    %-15s %s (%s, UTC%s)".formatted(
+                    city,
+                    localTime.format(DateTimeFormatter.ofPattern("HH:mm")),
+                    zone,
+                    localTime.getOffset()));
+            });
     }
 
     /**
@@ -1428,7 +1463,7 @@ public class DateTimeExercises {
      */
     static void meetingSchedulerAcrossZones() {
         List<String> zones = List.of(
-                "Europe/London", "America/New_York", "Asia/Tokyo");
+            "Europe/London", "America/New_York", "Asia/Tokyo");
 
         LocalDate meetingDate = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
         System.out.println("  ► 11.2 Meeting scheduler for " + meetingDate + ":");
@@ -1439,26 +1474,26 @@ public class DateTimeExercises {
             ZonedDateTime start = meetingDate.atTime(9, 0).atZone(zone);
             ZonedDateTime end = meetingDate.atTime(17, 0).atZone(zone);
             System.out.println("    %-25s Local 9am–5pm = UTC %s–%s".formatted(
-                    zoneStr,
-                    start.withZoneSameInstant(ZoneId.of("UTC")).toLocalTime(),
-                    end.withZoneSameInstant(ZoneId.of("UTC")).toLocalTime()));
+                zoneStr,
+                start.withZoneSameInstant(ZoneId.of("UTC")).toLocalTime(),
+                end.withZoneSameInstant(ZoneId.of("UTC")).toLocalTime()));
         });
 
         // Overlap: find the latest start and earliest end in UTC
         ZonedDateTime latestStart = zones.stream()
-                .map(z -> meetingDate.atTime(9, 0).atZone(ZoneId.of(z)))
-                .max(Comparator.comparing(ZonedDateTime::toInstant))
-                .orElseThrow();
+            .map(z -> meetingDate.atTime(9, 0).atZone(ZoneId.of(z)))
+            .max(Comparator.comparing(ZonedDateTime::toInstant))
+            .orElseThrow();
         ZonedDateTime earliestEnd = zones.stream()
-                .map(z -> meetingDate.atTime(17, 0).atZone(ZoneId.of(z)))
-                .min(Comparator.comparing(ZonedDateTime::toInstant))
-                .orElseThrow();
+            .map(z -> meetingDate.atTime(17, 0).atZone(ZoneId.of(z)))
+            .min(Comparator.comparing(ZonedDateTime::toInstant))
+            .orElseThrow();
 
         System.out.println("    ───────────────────────────────────────");
         if (latestStart.toInstant().isBefore(earliestEnd.toInstant())) {
             System.out.println("    ✓ Overlap: %s – %s UTC".formatted(
-                    latestStart.withZoneSameInstant(ZoneId.of("UTC")).toLocalTime(),
-                    earliestEnd.withZoneSameInstant(ZoneId.of("UTC")).toLocalTime()));
+                latestStart.withZoneSameInstant(ZoneId.of("UTC")).toLocalTime(),
+                earliestEnd.withZoneSameInstant(ZoneId.of("UTC")).toLocalTime()));
         } else {
             System.out.println("    ✗ No overlapping business hours!");
         }
@@ -1473,13 +1508,14 @@ public class DateTimeExercises {
      */
     static void internationalDateLine() {
         ZonedDateTime auckland = ZonedDateTime.of(2025, 6, 16, 2, 0, 0, 0,
-                ZoneId.of("Pacific/Auckland"));
+            ZoneId.of("Pacific/Auckland"));
         ZonedDateTime honolulu = auckland.withZoneSameInstant(
-                ZoneId.of("Pacific/Honolulu"));
+            ZoneId.of("Pacific/Honolulu"));
 
         printExercise("11.3 International Date Line:");
         printExercise("    Auckland", auckland.toLocalDate() + " " + auckland.toLocalTime());
-        printExercise("    Honolulu (same instant)", honolulu.toLocalDate() + " " + honolulu.toLocalTime());
+        printExercise("    Honolulu (same instant)",
+            honolulu.toLocalDate() + " " + honolulu.toLocalTime());
         printExercise("    ⚠ Different date for the same moment!", "");
     }
 
@@ -1493,17 +1529,17 @@ public class DateTimeExercises {
     static void halfHourAndQuarterHourOffsets() {
         Instant now = Instant.now();
         List<String> unusualZones = List.of(
-                "Asia/Kolkata",           // +05:30 (India)
-                "Asia/Kathmandu",         // +05:45 (Nepal)
-                "Australia/Adelaide",     // +09:30/+10:30 (DST)
-                "Asia/Yangon",            // +06:30 (Myanmar)
-                "Pacific/Chatham");       // +12:45/+13:45 (NZ Chatham)
+            "Asia/Kolkata",           // +05:30 (India)
+            "Asia/Kathmandu",         // +05:45 (Nepal)
+            "Australia/Adelaide",     // +09:30/+10:30 (DST)
+            "Asia/Yangon",            // +06:30 (Myanmar)
+            "Pacific/Chatham");       // +12:45/+13:45 (NZ Chatham)
 
         System.out.println("  ► 11.4 Non-standard timezone offsets:");
         unusualZones.forEach(z -> {
             ZonedDateTime zdt = now.atZone(ZoneId.of(z));
             System.out.println("    %-25s UTC%s  %s".formatted(
-                    z, zdt.getOffset(), zdt.toLocalTime()));
+                z, zdt.getOffset(), zdt.toLocalTime()));
         });
     }
 
@@ -1572,7 +1608,8 @@ public class DateTimeExercises {
 
         printExercise("12.3 Across spring-forward (2025-03-29 → 30):");
         printExercise("    + 1 day (Period)", plus1Day.toLocalTime() + " (same wall time)");
-        printExercise("    + 24 hours (Duration)", plus24Hours.toLocalTime() + " (1 hour different!)");
+        printExercise("    + 24 hours (Duration)",
+            plus24Hours.toLocalTime() + " (1 hour different!)");
         printExercise("    ⚠ Period preserves wall time, Duration counts real hours", "");
     }
 
@@ -1591,8 +1628,8 @@ public class DateTimeExercises {
         ZonedDateTime current = dailyMeeting;
         for (int i = 0; i < 5; i++) {
             System.out.println("    Day %d: %s %s (UTC%s)".formatted(
-                    i, current.toLocalDate(), current.toLocalTime(),
-                    current.getOffset()));
+                i, current.toLocalDate(), current.toLocalTime(),
+                current.getOffset()));
             current = current.plus(Period.ofDays(1));  // safe: preserves 9am
         }
     }
@@ -1616,13 +1653,18 @@ public class DateTimeExercises {
         printExercise("    lastDayOfMonth", date.with(TemporalAdjusters.lastDayOfMonth()));
         printExercise("    firstDayOfYear", date.with(TemporalAdjusters.firstDayOfYear()));
         printExercise("    lastDayOfYear", date.with(TemporalAdjusters.lastDayOfYear()));
-        printExercise("    firstDayOfNextMonth", date.with(TemporalAdjusters.firstDayOfNextMonth()));
+        printExercise("    firstDayOfNextMonth",
+            date.with(TemporalAdjusters.firstDayOfNextMonth()));
         printExercise("    firstDayOfNextYear", date.with(TemporalAdjusters.firstDayOfNextYear()));
         printExercise("    next(MONDAY)", date.with(TemporalAdjusters.next(DayOfWeek.MONDAY)));
-        printExercise("    nextOrSame(SUNDAY)", date.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY)));
-        printExercise("    previous(FRIDAY)", date.with(TemporalAdjusters.previous(DayOfWeek.FRIDAY)));
-        printExercise("    firstInMonth(MONDAY)", date.with(TemporalAdjusters.firstInMonth(DayOfWeek.MONDAY)));
-        printExercise("    lastInMonth(FRIDAY)", date.with(TemporalAdjusters.lastInMonth(DayOfWeek.FRIDAY)));
+        printExercise("    nextOrSame(SUNDAY)",
+            date.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY)));
+        printExercise("    previous(FRIDAY)",
+            date.with(TemporalAdjusters.previous(DayOfWeek.FRIDAY)));
+        printExercise("    firstInMonth(MONDAY)",
+            date.with(TemporalAdjusters.firstInMonth(DayOfWeek.MONDAY)));
+        printExercise("    lastInMonth(FRIDAY)",
+            date.with(TemporalAdjusters.lastInMonth(DayOfWeek.FRIDAY)));
     }
 
     /**
@@ -1655,9 +1697,9 @@ public class DateTimeExercises {
         LocalDate midQuarter = LocalDate.of(2025, 5, 15);
 
         printExercise("13.2 Custom: next working day after " + friday,
-                friday.with(nextWorkingDay));
+            friday.with(nextWorkingDay));
         printExercise("    Custom: last day of quarter for " + midQuarter,
-                midQuarter.with(lastDayOfQuarter));
+            midQuarter.with(lastDayOfQuarter));
     }
 
     /**
@@ -1677,7 +1719,7 @@ public class DateTimeExercises {
 
         // Custom query: which quarter is this date in?
         TemporalQuery<Integer> quarterQuery = temporal ->
-                (LocalDate.from(temporal).getMonthValue() - 1) / 3 + 1;
+            (LocalDate.from(temporal).getMonthValue() - 1) / 3 + 1;
 
         printExercise("13.3 precision()", precision);
         printExercise("    zone()", zone);
@@ -1695,9 +1737,9 @@ public class DateTimeExercises {
         // Count business days in a range
         LocalDate end = LocalDate.of(2025, 6, 30);
         long businessDays = start.datesUntil(end)
-                .filter(d -> d.getDayOfWeek() != DayOfWeek.SATURDAY
-                        && d.getDayOfWeek() != DayOfWeek.SUNDAY)
-                .count();
+            .filter(d -> d.getDayOfWeek() != DayOfWeek.SATURDAY
+                && d.getDayOfWeek() != DayOfWeek.SUNDAY)
+            .count();
 
         // Add N business days
         int daysToAdd = 10;
@@ -1706,7 +1748,7 @@ public class DateTimeExercises {
         while (added < daysToAdd) {
             result = result.plusDays(1);
             if (result.getDayOfWeek() != DayOfWeek.SATURDAY
-                    && result.getDayOfWeek() != DayOfWeek.SUNDAY) {
+                && result.getDayOfWeek() != DayOfWeek.SUNDAY) {
                 added++;
             }
         }
@@ -1766,11 +1808,11 @@ public class DateTimeExercises {
     static void supportedUnits() {
         printExercise("14.3 Supported units:");
         printExercise("    LocalDate", LocalDate.now().isSupported(ChronoUnit.DAYS) + " (DAYS), "
-                + LocalDate.now().isSupported(ChronoUnit.HOURS) + " (HOURS)");
+            + LocalDate.now().isSupported(ChronoUnit.HOURS) + " (HOURS)");
         printExercise("    LocalTime", LocalTime.now().isSupported(ChronoUnit.HOURS) + " (HOURS), "
-                + LocalTime.now().isSupported(ChronoUnit.DAYS) + " (DAYS)");
+            + LocalTime.now().isSupported(ChronoUnit.DAYS) + " (DAYS)");
         printExercise("    Instant", Instant.now().isSupported(ChronoUnit.SECONDS) + " (SECONDS), "
-                + Instant.now().isSupported(ChronoUnit.DAYS) + " (DAYS)");
+            + Instant.now().isSupported(ChronoUnit.DAYS) + " (DAYS)");
     }
 
     // ═══════════════════════════════════════════════════════════════════
@@ -1840,7 +1882,7 @@ public class DateTimeExercises {
 
         // java.sql.Timestamp ↔ LocalDateTime / Instant
         java.sql.Timestamp sqlTimestamp = java.sql.Timestamp.valueOf(
-                LocalDateTime.of(2025, 6, 15, 14, 30));
+            LocalDateTime.of(2025, 6, 15, 14, 30));
         LocalDateTime fromSqlTimestamp = sqlTimestamp.toLocalDateTime();
         Instant fromSqlInstant = sqlTimestamp.toInstant();
 
@@ -1880,11 +1922,12 @@ public class DateTimeExercises {
      */
     static void pitfallEqualsVsIsEqual() {
         ZonedDateTime london = ZonedDateTime.of(2025, 6, 15, 14, 0, 0, 0,
-                ZoneId.of("Europe/London"));
+            ZoneId.of("Europe/London"));
         ZonedDateTime paris = london.withZoneSameInstant(ZoneId.of("Europe/Paris"));
 
         printExercise("16.2 ⚠ PITFALL: equals() vs isEqual()");
-        printExercise("    london.equals(paris)", london.equals(paris) + " ← WRONG for same-instant check");
+        printExercise("    london.equals(paris)",
+            london.equals(paris) + " ← WRONG for same-instant check");
         printExercise("    london.isEqual(paris)", london.isEqual(paris) + " ← CORRECT");
         printExercise("    Instants equal?", london.toInstant().equals(paris.toInstant()));
     }
@@ -1961,13 +2004,15 @@ public class DateTimeExercises {
     static void pitfallDurationVsPeriod() {
         printExercise("16.6 ⚠ PITFALL: Duration vs Period");
         printExercise("    Duration.ofDays(1)", Duration.ofDays(1) + " = exactly 24 hours");
-        printExercise("    Period.ofDays(1)", Period.ofDays(1) + " = calendar day (may be 23 or 25 hours)");
+        printExercise("    Period.ofDays(1)",
+            Period.ofDays(1) + " = calendar day (may be 23 or 25 hours)");
         printExercise("    ⚠ For scheduling: use Period. For elapsed time: use Duration.", "");
 
         // Duration.ofDays(1) can't be added to LocalDate
         try {
             LocalDate.now().plus(Duration.ofDays(1));
-            printExercise("    LocalDate + Duration", "worked (surprising but valid for whole days)");
+            printExercise("    LocalDate + Duration",
+                "worked (surprising but valid for whole days)");
         } catch (UnsupportedTemporalTypeException e) {
             printExercise("    ⚠ LocalDate + Duration", "THROWS — use Period instead");
         }
@@ -2043,7 +2088,7 @@ public class DateTimeExercises {
         // Demonstrate
         try {
             DateTimeFormatter strict = DateTimeFormatter.ofPattern("uuuu-MM-dd")
-                    .withResolverStyle(ResolverStyle.STRICT);
+                .withResolverStyle(ResolverStyle.STRICT);
             LocalDate bcDate = LocalDate.parse("-0044-03-15", strict);
             printExercise("    Parsed BC date", bcDate + " (44 BC)");
         } catch (Exception e) {
@@ -2060,10 +2105,10 @@ public class DateTimeExercises {
      */
     static void personsGroupedByBirthMonth() {
         Map<Month, List<String>> byMonth = PEOPLE.stream()
-                .collect(Collectors.groupingBy(
-                        p -> p.getDateOfBirth().getMonth(),
-                        () -> new TreeMap<>(Comparator.comparingInt(Month::getValue)),
-                        Collectors.mapping(Person::getFullName, Collectors.toList())));
+            .collect(Collectors.groupingBy(
+                p -> p.getDateOfBirth().getMonth(),
+                () -> new TreeMap<>(Comparator.comparingInt(Month::getValue)),
+                Collectors.mapping(Person::getFullName, Collectors.toList())));
 
         printExercise("17.1 People by birth month", byMonth);
     }
@@ -2073,13 +2118,13 @@ public class DateTimeExercises {
      */
     static void personsGroupedByAgeDecade() {
         Map<String, List<String>> byDecade = PEOPLE.stream()
-                .collect(Collectors.groupingBy(
-                        p -> {
-                            int decade = (p.getAge() / 10) * 10;
-                            return "%ds".formatted(decade);
-                        },
-                        TreeMap::new,
-                        Collectors.mapping(Person::getFullName, Collectors.toList())));
+            .collect(Collectors.groupingBy(
+                p -> {
+                    int decade = (p.getAge() / 10) * 10;
+                    return "%ds".formatted(decade);
+                },
+                TreeMap::new,
+                Collectors.mapping(Person::getFullName, Collectors.toList())));
 
         printExercise("17.2 People by age decade", byDecade);
     }
@@ -2089,13 +2134,13 @@ public class DateTimeExercises {
      */
     static void averageAgeInDays() {
         OptionalDouble avgDays = PEOPLE.stream()
-                .mapToLong(p -> ChronoUnit.DAYS.between(p.getDateOfBirth(), LocalDate.now()))
-                .average();
+            .mapToLong(p -> ChronoUnit.DAYS.between(p.getDateOfBirth(), LocalDate.now()))
+            .average();
 
         printExercise("17.3 Average age in days",
-                avgDays.isPresent() ? "%.0f days (≈%.1f years)".formatted(
-                        avgDays.getAsDouble(),
-                        avgDays.getAsDouble() / 365.25) : "N/A");
+            avgDays.isPresent() ? "%.0f days (≈%.1f years)".formatted(
+                avgDays.getAsDouble(),
+                avgDays.getAsDouble() / 365.25) : "N/A");
     }
 
     /**
@@ -2103,16 +2148,16 @@ public class DateTimeExercises {
      */
     static void oldestAndYoungestPerson() {
         Person oldest = PEOPLE.stream()
-                .min(Comparator.comparing(Person::getDateOfBirth))
-                .orElseThrow();
+            .min(Comparator.comparing(Person::getDateOfBirth))
+            .orElseThrow();
         Person youngest = PEOPLE.stream()
-                .max(Comparator.comparing(Person::getDateOfBirth))
-                .orElseThrow();
+            .max(Comparator.comparing(Person::getDateOfBirth))
+            .orElseThrow();
 
         printExercise("17.4 Oldest", "%s (born %s, age %d)"
-                .formatted(oldest.getFullName(), oldest.getDateOfBirth(), oldest.getAge()));
+            .formatted(oldest.getFullName(), oldest.getDateOfBirth(), oldest.getAge()));
         printExercise("    Youngest", "%s (born %s, age %d)"
-                .formatted(youngest.getFullName(), youngest.getDateOfBirth(), youngest.getAge()));
+            .formatted(youngest.getFullName(), youngest.getDateOfBirth(), youngest.getAge()));
     }
 
     /**
@@ -2121,9 +2166,9 @@ public class DateTimeExercises {
     static void birthdayThisMonth() {
         Month currentMonth = LocalDate.now().getMonth();
         List<String> birthdaysThisMonth = PEOPLE.stream()
-                .filter(p -> p.getDateOfBirth().getMonth() == currentMonth)
-                .map(p -> "%s (%s)".formatted(p.getFullName(), p.getDateOfBirth()))
-                .toList();
+            .filter(p -> p.getDateOfBirth().getMonth() == currentMonth)
+            .map(p -> "%s (%s)".formatted(p.getFullName(), p.getDateOfBirth()))
+            .toList();
 
         printExercise("17.5 Birthdays in " + currentMonth, birthdaysThisMonth);
     }
@@ -2136,20 +2181,20 @@ public class DateTimeExercises {
 
         System.out.println("  ► 17.6 Days until next birthday:");
         PEOPLE.stream()
-                .map(p -> {
-                    MonthDay birthday = MonthDay.from(p.getDateOfBirth());
-                    LocalDate nextBirthday = birthday.atYear(today.getYear());
-                    if (!nextBirthday.isAfter(today)) {
-                        nextBirthday = birthday.atYear(today.getYear() + 1);
-                    }
-                    long days = ChronoUnit.DAYS.between(today, nextBirthday);
-                    return Map.entry(p.getFullName(), days);
-                })
-                .sorted(Map.Entry.comparingByValue())
-                .forEach(e -> System.out.println("    %-20s %3d days (%s)"
-                        .formatted(e.getKey(), e.getValue(),
-                                e.getValue() == 0 ? "TODAY!" :
-                                        e.getValue() <= 30 ? "soon!" : "")));
+            .map(p -> {
+                MonthDay birthday = MonthDay.from(p.getDateOfBirth());
+                LocalDate nextBirthday = birthday.atYear(today.getYear());
+                if (!nextBirthday.isAfter(today)) {
+                    nextBirthday = birthday.atYear(today.getYear() + 1);
+                }
+                long days = ChronoUnit.DAYS.between(today, nextBirthday);
+                return Map.entry(p.getFullName(), days);
+            })
+            .sorted(Map.Entry.comparingByValue())
+            .forEach(e -> System.out.println("    %-20s %3d days (%s)"
+                .formatted(e.getKey(), e.getValue(),
+                    e.getValue() == 0 ? "TODAY!" :
+                        e.getValue() <= 30 ? "soon!" : "")));
     }
 
     /**
@@ -2157,12 +2202,12 @@ public class DateTimeExercises {
      */
     static void dateOfBirthStatistics() {
         IntSummaryStatistics yearStats = PEOPLE.stream()
-                .mapToInt(p -> p.getDateOfBirth().getYear())
-                .summaryStatistics();
+            .mapToInt(p -> p.getDateOfBirth().getYear())
+            .summaryStatistics();
 
         printExercise("17.7 Birth year statistics",
-                "min=%d, max=%d, avg=%.0f".formatted(
-                        yearStats.getMin(), yearStats.getMax(), yearStats.getAverage()));
+            "min=%d, max=%d, avg=%.0f".formatted(
+                yearStats.getMin(), yearStats.getMax(), yearStats.getAverage()));
     }
 
     // ═══════════════════════════════════════════════════════════════════
@@ -2181,8 +2226,8 @@ public class DateTimeExercises {
         Period age = Period.between(birthDate, today);
 
         printExercise("18.1 Exact age from 1990-03-15",
-                "%d years, %d months, %d days".formatted(
-                        age.getYears(), age.getMonths(), age.getDays()));
+            "%d years, %d months, %d days".formatted(
+                age.getYears(), age.getMonths(), age.getDays()));
     }
 
     /**
@@ -2197,7 +2242,7 @@ public class DateTimeExercises {
         do {
             nextBiz = nextBiz.plusDays(1);
         } while (nextBiz.getDayOfWeek() == DayOfWeek.SATURDAY
-                || nextBiz.getDayOfWeek() == DayOfWeek.SUNDAY);
+            || nextBiz.getDayOfWeek() == DayOfWeek.SUNDAY);
 
         printExercise("18.2 Today", today + " (" + today.getDayOfWeek() + ")");
         printExercise("    Next business day", nextBiz + " (" + nextBiz.getDayOfWeek() + ")");
@@ -2209,7 +2254,7 @@ public class DateTimeExercises {
     static void isWeekendCheck() {
         LocalDate date = LocalDate.now();
         boolean isWeekend = date.getDayOfWeek() == DayOfWeek.SATURDAY
-                || date.getDayOfWeek() == DayOfWeek.SUNDAY;
+            || date.getDayOfWeek() == DayOfWeek.SUNDAY;
 
         printExercise("18.3 Is today a weekend?", isWeekend + " (" + date.getDayOfWeek() + ")");
     }
@@ -2226,13 +2271,13 @@ public class DateTimeExercises {
         LocalDate end = LocalDate.of(2025, 6, 16);
 
         List<String> week = start.datesUntil(end)
-                .map(d -> "%s %s".formatted(d, d.getDayOfWeek()))
-                .toList();
+            .map(d -> "%s %s".formatted(d, d.getDayOfWeek()))
+            .toList();
 
         // With step (every 3rd day)
         List<String> everyThirdDay = start.datesUntil(end, Period.ofDays(3))
-                .map(d -> "%s %s".formatted(d, d.getDayOfWeek()))
-                .toList();
+            .map(d -> "%s %s".formatted(d, d.getDayOfWeek()))
+            .toList();
 
         printExercise("18.4 Date range (daily)", week);
         printExercise("    Every 3rd day", everyThirdDay);
@@ -2249,14 +2294,14 @@ public class DateTimeExercises {
         LocalDate end = LocalDate.of(2025, 6, 30);
 
         long workingDays = start.datesUntil(end)
-                .filter(d -> d.getDayOfWeek() != DayOfWeek.SATURDAY
-                        && d.getDayOfWeek() != DayOfWeek.SUNDAY)
-                .count();
+            .filter(d -> d.getDayOfWeek() != DayOfWeek.SATURDAY
+                && d.getDayOfWeek() != DayOfWeek.SUNDAY)
+            .count();
 
         long weekendDays = start.datesUntil(end)
-                .filter(d -> d.getDayOfWeek() == DayOfWeek.SATURDAY
-                        || d.getDayOfWeek() == DayOfWeek.SUNDAY)
-                .count();
+            .filter(d -> d.getDayOfWeek() == DayOfWeek.SATURDAY
+                || d.getDayOfWeek() == DayOfWeek.SUNDAY)
+            .count();
 
         printExercise("18.5 Working days Jun 1–30", workingDays);
         printExercise("    Weekend days", weekendDays);
@@ -2277,11 +2322,11 @@ public class DateTimeExercises {
 
         // RFC 1123 (used in HTTP headers)
         String rfc1123 = DateTimeFormatter.RFC_1123_DATE_TIME
-                .format(now.atZone(ZoneId.of("UTC")));
+            .format(now.atZone(ZoneId.of("UTC")));
 
         // ISO with explicit offset
         String isoOffset = OffsetDateTime.ofInstant(now, ZoneOffset.UTC)
-                .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+            .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
 
         printExercise("18.6 API format — ISO UTC", isoUtc);
         printExercise("    HTTP header — RFC 1123", rfc1123);
@@ -2303,13 +2348,13 @@ public class DateTimeExercises {
         while (added < slaBusinessDays) {
             deadline = deadline.plusDays(1);
             if (deadline.getDayOfWeek() != DayOfWeek.SATURDAY
-                    && deadline.getDayOfWeek() != DayOfWeek.SUNDAY) {
+                && deadline.getDayOfWeek() != DayOfWeek.SUNDAY) {
                 added++;
             }
         }
 
         printExercise("18.7 SLA: 5 business days from " + requestDate,
-                deadline + " (" + deadline.getDayOfWeek() + ")");
+            deadline + " (" + deadline.getDayOfWeek() + ")");
     }
 
     /**
@@ -2324,18 +2369,18 @@ public class DateTimeExercises {
             String format() {
                 ZonedDateTime userTime = timestamp.atZone(userZone);
                 return "[%s UTC | %s %s] %s".formatted(
-                        timestamp.truncatedTo(ChronoUnit.SECONDS),
-                        userTime.format(DateTimeFormatter.ofPattern("HH:mm:ss")),
-                        userZone.getId(),
-                        event);
+                    timestamp.truncatedTo(ChronoUnit.SECONDS),
+                    userTime.format(DateTimeFormatter.ofPattern("HH:mm:ss")),
+                    userZone.getId(),
+                    event);
             }
         }
 
         Instant now = Instant.now();
         List<AuditEntry> log = List.of(
-                new AuditEntry("User login", now, ZoneId.of("Europe/London")),
-                new AuditEntry("Record updated", now.plusSeconds(120), ZoneId.of("Asia/Tokyo")),
-                new AuditEntry("Report exported", now.plusSeconds(300), ZoneId.of("America/New_York")));
+            new AuditEntry("User login", now, ZoneId.of("Europe/London")),
+            new AuditEntry("Record updated", now.plusSeconds(120), ZoneId.of("Asia/Tokyo")),
+            new AuditEntry("Report exported", now.plusSeconds(300), ZoneId.of("America/New_York")));
 
         System.out.println("  ► 18.8 Timezone-aware audit log:");
         log.forEach(entry -> System.out.println("    " + entry.format()));
