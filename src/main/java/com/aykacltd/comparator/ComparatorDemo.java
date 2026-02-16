@@ -101,7 +101,7 @@ public class ComparatorDemo {
   public static Comparator<Person> complexComparator() {
     return Comparator.comparing(Person::getName,
             Comparator.nullsFirst(String.CASE_INSENSITIVE_ORDER))
-        .thenComparing(Person::getSurname, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER))
+        .thenComparing(Person::getSurname, String.CASE_INSENSITIVE_ORDER)
         .thenComparing(Person::getAge, Comparator.nullsLast(Integer::compareTo))
         .thenComparing(Person::getSalary, Comparator.nullsFirst(Double::compareTo));
   }
@@ -138,6 +138,12 @@ public class ComparatorDemo {
 
     System.out.println("=== By Name ===");
     people.stream().sorted(comparingByName()).forEach(System.out::println);
+
+    System.out.println("=== By Name - Reversed ===");
+    people.stream().sorted(comparingByName().reversed()).forEach(System.out::println);
+
+    System.out.println("=== By Name - NaturalOrder ===");
+    people.stream().map(Person::getName).sorted(naturalOrder()).forEach(System.out::println);
 
     System.out.println("\n=== By Age ===");
     people.stream().sorted(comparingByAge()).forEach(System.out::println);
