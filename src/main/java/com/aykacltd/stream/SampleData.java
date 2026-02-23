@@ -23,6 +23,16 @@ import java.util.List;
  */
 public final class SampleData {
 
+  static Person noBody = Person.builder()
+      .firstName("Nobody").lastName("Nobody")
+      .dateOfBirth(LocalDate.of(1970, 1, 1)) // cannot be null (required by Person)
+      .gender(Gender.NON_BINARY)             // cannot be null (required by Person)
+      .email("nobody@person.per")
+      .profession(null)
+      // addresses omitted -> becomes empty list
+      // skills omitted -> becomes empty
+      .build();
+
   private SampleData() {
     // utility class — no instantiation
   }
@@ -52,7 +62,41 @@ public final class SampleData {
                 new Skill("Docker", ProficiencyLevel.INTERMEDIATE, "DevOps")
             ))
             .build(),
-
+        Person.builder()
+            .firstName("Alice").lastName("Morgan")
+            .dateOfBirth(LocalDate.of(1990, 3, 15))
+            .gender(Gender.FEMALE)
+            .email("alice.morgan3@techcorp.com")
+            .addresses(List.of(
+                new Address("12 Week Lane", "Liverpool", "UK", "SW1A 1AA", AddressType.HOME),
+                new Address("100 Tako Park", "Leeds", "UK", "EC2A 1NT", AddressType.WORK)
+            ))
+            .profession(null)
+            .skills(List.of(
+                new Skill("Java", ProficiencyLevel.EXPERT, "Programming"),
+                new Skill("Spring Boot", ProficiencyLevel.ADVANCED, "Framework"),
+                new Skill("SQL", ProficiencyLevel.ADVANCED, "Database"),
+                new Skill("Docker", ProficiencyLevel.INTERMEDIATE, "DevOps")
+            ))
+            .build(),
+        Person.builder()
+            .firstName("Alice").lastName("Morgan")
+            .dateOfBirth(LocalDate.of(1990, 3, 15))
+            .gender(Gender.FEMALE)
+            .email("alice.morgan2@techcorp.com")
+            .addresses(List.of(
+                new Address("12 Week Lane", "Liverpool", "UK", "SW1A 1AA", AddressType.HOME),
+                new Address("100 Tako Park", "Leeds", "UK", "EC2A 1NT", AddressType.WORK)
+            ))
+            .profession(new Profession("", "Engineering", "", 8, 0,
+                EmploymentStatus.UNEMPLOYED))
+            .skills(List.of(
+                new Skill("Java", ProficiencyLevel.EXPERT, "Programming"),
+                new Skill("Spring Boot", ProficiencyLevel.ADVANCED, "Framework"),
+                new Skill("SQL", ProficiencyLevel.ADVANCED, "Database"),
+                new Skill("Docker", ProficiencyLevel.INTERMEDIATE, "DevOps")
+            ))
+            .build(),
         Person.builder()
             .firstName("Bob").lastName("Chen")
             .dateOfBirth(LocalDate.of(1985, 7, 22))
@@ -242,6 +286,24 @@ public final class SampleData {
             ))
             .build(),
 
+        Person.builder()
+            .firstName("Liam").lastName("O'Brien")
+            .dateOfBirth(LocalDate.of(1996, 10, 20))
+            .gender(Gender.MALE)
+            .email("liam.obrien@unemployed.ie")
+            .addresses(List.of(
+                new Address("18 Grafton St", "Dublin", "Ireland", "D02 VF65", AddressType.HOME)
+            ))
+            .profession(new Profession("Software Developer", "N/A", "N/A", 3, 0,
+                EmploymentStatus.UNEMPLOYED))
+            .skills(List.of(
+                new Skill("Java", ProficiencyLevel.ADVANCED, "Programming"),
+                new Skill("Spring Boot", ProficiencyLevel.INTERMEDIATE, "Framework"),
+                new Skill("React", ProficiencyLevel.INTERMEDIATE, "Framework"),
+                new Skill("Docker", ProficiencyLevel.BEGINNER, "DevOps")
+            ))
+            .build(),
+// ... existing code ...
         Person.builder()
             .firstName("Liam").lastName("O'Brien")
             .dateOfBirth(LocalDate.of(1996, 10, 20))
