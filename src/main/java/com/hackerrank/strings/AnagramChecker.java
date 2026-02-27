@@ -57,10 +57,13 @@ public class AnagramChecker {
     }
 
     for (char c : t.toLowerCase().toCharArray()) {
-      charCount[c] -= 1;
-      if (charCount[c] < 0) {
+      if (charCount[c] == 0) {
         return false;
       }
+//      charCount[c] -= 1;
+//      if (charCount[c] < 0) {
+//        return false;
+//      }
     }
     return true;
   }
